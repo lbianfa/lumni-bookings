@@ -6,7 +6,7 @@ App de reservas de salas para un coworking: los clientes cotizan y reservan sala
 
 Los requisitos están resumidos en [`CONTEXT.es.md`](CONTEXT.es.md) (fuente: guía de la prueba técnica, Partes 1 y 2).
 
-> Estado: planificación. Todavía no hay código. Este README registra las decisiones hasta ahora; la sección "Garantías" se completará durante la implementación.
+> Estado: planificación. Existen los proyectos base del frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) y de la API ([`lumni-bookings-api`](lumni-bookings-api)); todavía no hay funcionalidades. Este README registra las decisiones hasta ahora; la sección "Garantías" se completará durante la implementación.
 
 ## Stack tecnológico
 
@@ -62,6 +62,22 @@ Este proyecto se desarrolla con ayuda de un asistente de IA. Esta sección regis
 |-------|-------|-----------|
 | 2026-10-25 | Leer la guía de la prueba técnica y resumir las Partes 1 y 2 en un archivo de contexto, usando la Parte 3 solo para alinear el modelo de datos. | [`CONTEXT.md`](CONTEXT.md) |
 | 2026-10-25 | Redactar este README: decisiones tomadas, decisiones pendientes y el esquema de garantías. | [`README.md`](README.md) |
+| 2026-10-25 | Seleccionar y auditar las skills de Claude Code para la API, y redactar sus reglas de arquitectura. | [`.claude/skills/`](.claude/skills), [`lumni-bookings-api/CLAUDE.md`](lumni-bookings-api/CLAUDE.md) |
+
+### Skills de Claude Code
+
+Las skills del proyecto están en [`.claude/skills/`](.claude/skills) y se versionan como las copias exactas que se auditaron. [`skills-lock.json`](skills-lock.json) registra el origen y el hash del contenido de cada skill. Se instalaron con el CLI [`skills`](https://github.com/vercel-labs/skills) (`npx skills add <repo> --skill <name> -a claude-code --copy`).
+
+| Skill | Origen | Uso |
+|-------|--------|-----|
+| `nestjs-best-practices` | [`Kadajett/agent-nestjs-skills`](https://github.com/Kadajett/agent-nestjs-skills) | Mecánica de NestJS: módulos, DI, pipes, guards, configuración, módulo de testing. |
+| `clean-ddd-hexagonal` | [`ccheney/robust-skills`](https://github.com/ccheney/robust-skills) | Clean Architecture, DDD táctico, puertos y adaptadores. |
+| `prisma-orm-setup` | [`prisma/skills`](https://github.com/prisma/skills) (oficial) | Configuración de Prisma ORM 8 y conexión a PostgreSQL. |
+
+- **Criterios de selección:** el autor es una organización oficial o un mantenedor identificable y con trayectoria; el contenido es solo Markdown y se leyó antes de instalar; la copia instalada se comparó contra la copia auditada.
+- **Las reglas del proyecto tienen prioridad:** [`lumni-bookings-api/CLAUDE.md`](lumni-bookings-api/CLAUDE.md) reemplaza a las skills cuando entran en conflicto: sin CQRS ni Event Sourcing, sin `HttpException` en el código de negocio, Prisma solo en la capa de infraestructura.
+- **Actualización:** `npx skills update` descarga la última versión del autor sin compararla con el hash del lock. Revisar el diff antes de commitearlo.
+- **Pendiente:** la skill `prisma-8` viene con el paquete de Prisma; se agrega con `npx prisma skills sync` cuando Prisma 8 esté instalado en la API.
 
 ## Garantías
 

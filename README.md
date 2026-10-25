@@ -6,7 +6,7 @@ Room booking app for a coworking: customers quote and book rooms, admins manage 
 
 Requirements are summarized in [`CONTEXT.md`](CONTEXT.md) (source: technical assessment guide, Parts 1 and 2).
 
-> Status: planning. No code yet. This README records decisions so far; the "Guarantees" section will be completed during implementation.
+> Status: planning. The frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) and API ([`lumni-bookings-api`](lumni-bookings-api)) scaffolds exist; no features yet. This README records decisions so far; the "Guarantees" section will be completed during implementation.
 
 ## Tech stack
 
@@ -62,6 +62,22 @@ This project is developed with the help of an AI assistant. This section records
 |------|------|--------|
 | 2026-10-25 | Read the technical assessment guide and summarize Parts 1 and 2 into a context file, using Part 3 only to align the data model. | [`CONTEXT.md`](CONTEXT.md) |
 | 2026-10-25 | Draft this README: decisions taken, pending decisions and the guarantees outline. | [`README.md`](README.md) |
+| 2026-10-25 | Select and audit Claude Code skills for the API, and write its architecture rules. | [`.claude/skills/`](.claude/skills), [`lumni-bookings-api/CLAUDE.md`](lumni-bookings-api/CLAUDE.md) |
+
+### Claude Code skills
+
+Project-level skills live in [`.claude/skills/`](.claude/skills) and are committed as the exact copies that were audited. [`skills-lock.json`](skills-lock.json) records each skill's source and content hash. They were installed with the [`skills`](https://github.com/vercel-labs/skills) CLI (`npx skills add <repo> --skill <name> -a claude-code --copy`).
+
+| Skill | Source | Used for |
+|-------|--------|----------|
+| `nestjs-best-practices` | [`Kadajett/agent-nestjs-skills`](https://github.com/Kadajett/agent-nestjs-skills) | NestJS mechanics: modules, DI, pipes, guards, config, testing module. |
+| `clean-ddd-hexagonal` | [`ccheney/robust-skills`](https://github.com/ccheney/robust-skills) | Clean Architecture, tactical DDD, ports and adapters. |
+| `prisma-orm-setup` | [`prisma/skills`](https://github.com/prisma/skills) (official) | Prisma ORM 8 setup and PostgreSQL connection. |
+
+- **Selection criteria:** the author is an official organization or an identifiable, long-standing maintainer; the content is Markdown only and was read before installing; the installed copy was diffed against the audited copy.
+- **Project rules win:** [`lumni-bookings-api/CLAUDE.md`](lumni-bookings-api/CLAUDE.md) overrides the skills where they conflict: no CQRS or Event Sourcing, no `HttpException` in business code, Prisma only in the infrastructure layer.
+- **Updating:** `npx skills update` downloads the author's latest version without checking it against the lock hash. Review the diff before committing it.
+- **Pending:** the `prisma-8` skill ships with the Prisma package; add it with `npx prisma skills sync` once Prisma 8 is installed in the API.
 
 ## Guarantees
 
