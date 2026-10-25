@@ -66,16 +66,16 @@ This project is developed with the help of an AI assistant. This section records
 
 ### Claude Code skills
 
-Each app keeps its own skills: the frontend ones in [`.claude/skills/`](.claude/skills) at the repository root, and the API ones in [`lumni-bookings-api/.claude/skills/`](lumni-bookings-api/.claude/skills), which Claude Code loads once it works on API files. Third-party skills are committed as the exact copies that were audited. Each folder's `skills-lock.json` ([root](skills-lock.json), [API](lumni-bookings-api/skills-lock.json)) records each skill's source and content hash. They were installed with the [`skills`](https://github.com/vercel-labs/skills) CLI (`npx skills add <repo> --skill <name> -a claude-code --copy`).
+Each app keeps its own skills in its folder: [`lumni-bookings-spa/.claude/skills/`](lumni-bookings-spa/.claude/skills) and [`lumni-bookings-api/.claude/skills/`](lumni-bookings-api/.claude/skills). Claude Code loads them once it works on that app's files. Third-party skills are committed as the exact copies that were audited. Each folder's `skills-lock.json` ([SPA](lumni-bookings-spa/skills-lock.json), [API](lumni-bookings-api/skills-lock.json)) records each skill's source and content hash. They were installed with the [`skills`](https://github.com/vercel-labs/skills) CLI (`npx skills add <repo> --skill <name> -a claude-code --copy`).
 
 | Skill | Source | Used for |
 |-------|--------|----------|
 | `nestjs-best-practices` (API) | [`Kadajett/agent-nestjs-skills`](https://github.com/Kadajett/agent-nestjs-skills) | NestJS mechanics: modules, DI, pipes, guards, config, testing module. |
 | `clean-ddd-hexagonal` (API) | [`ccheney/robust-skills`](https://github.com/ccheney/robust-skills) | Clean Architecture, tactical DDD, ports and adapters. |
 | `prisma-8`, `prisma-composer-core-concepts`, `prisma-platform-core-concepts` (API) | Prisma packages (official) | Prisma ORM 8 contracts, migrations and queries; Composer and deployment. Copied by `prisma skills sync` on every `pnpm install`, so they always match the installed version. |
-| `vite` | [`antfu/skills`](https://github.com/antfu/skills) (Anthony Fu, Vite core team) | Vite 8 config and plugins. |
-| `vercel-react-best-practices` | [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills) (official) | React re-render, bundle and rendering performance. Its Next.js and server rules are disabled in [`lumni-bookings-spa/CLAUDE.md`](lumni-bookings-spa/CLAUDE.md). |
-| `tanstack` | [`pedronauck/skills`](https://github.com/pedronauck/skills) (Pedro Nauck) | TanStack Query and Form, which ship no official skills yet. Its Router part is overridden by the official skills. |
+| `vite` (SPA) | [`antfu/skills`](https://github.com/antfu/skills) (Anthony Fu, Vite core team) | Vite 8 config and plugins. |
+| `vercel-react-best-practices` (SPA) | [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills) (official) | React re-render, bundle and rendering performance. Its Next.js and server rules are disabled in [`lumni-bookings-spa/CLAUDE.md`](lumni-bookings-spa/CLAUDE.md). |
+| `tanstack` (SPA) | [`pedronauck/skills`](https://github.com/pedronauck/skills) (Pedro Nauck) | TanStack Query and Form, which ship no official skills yet. Its Router part is overridden by the official skills. |
 
 TanStack Router and Table skills are official and ship inside the TanStack npm packages, so they always match the installed version. [TanStack Intent](https://github.com/TanStack/intent) (`@tanstack/intent`, a SPA dev dependency) loads them; `intent.skills` in [`lumni-bookings-spa/package.json`](lumni-bookings-spa/package.json) allows only the Router and Table packages, and `pnpm exec intent install` writes the loading guidance into the SPA `CLAUDE.md`.
 

@@ -18,6 +18,8 @@ Before editing files for a substantial task:
 
 ## Skill precedence
 
+Third-party skills live in [`.claude/skills/`](.claude/skills) as audited copies, recorded in [`skills-lock.json`](skills-lock.json). The official TanStack skills stay inside their packages and load through Intent.
+
 These rules override the installed skills when they conflict:
 
 - TanStack Router and Table: the official package skills loaded through Intent win over any other skill.
