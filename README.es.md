@@ -12,7 +12,7 @@ Los requisitos están resumidos en [`CONTEXT.es.md`](CONTEXT.es.md) (fuente: gu�
 
 | Capa | Tecnología |
 |------|------------|
-| Frontend | React + TypeScript |
+| Frontend | React + TypeScript (Vite, TanStack Router) |
 | Backend | NestJS + TypeScript |
 | Base de datos | PostgreSQL |
 | ORM / migraciones | Prisma (lo que no modela, como el exclusion constraint de D-05, va como SQL a mano en las migraciones) |

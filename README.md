@@ -12,7 +12,7 @@ Requirements are summarized in [`CONTEXT.md`](CONTEXT.md) (source: technical ass
 
 | Layer | Technology |
 |-------|------------|
-| Frontend | React + TypeScript |
+| Frontend | React + TypeScript (Vite, TanStack Router) |
 | Backend | NestJS + TypeScript |
 | Database | PostgreSQL |
 | ORM / migrations | Prisma (features it does not model, such as the D-05 exclusion constraint, go as custom SQL in migrations) |
