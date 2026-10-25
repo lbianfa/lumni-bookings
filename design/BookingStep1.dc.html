@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Booking, step 1: customer details</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0B5E52}a:hover{color:#084A40}
+select,input,textarea,button{font:inherit}
+button{cursor:pointer}
+select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #7CCBBC;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F5F6F8; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #14181F">
+
+<header style="background: #FFFFFF; border-bottom: 1px solid #E2E5EA">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 8px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px">
+    <a href="Main.dc.html" style="display: inline-flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: #14181F; font-weight: 700; font-size: 18px">
+      <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 8px; background: #0E7C6B; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-size: 15px">L</span>
+      Lumni
+    </a>
+    <nav aria-label="Main" style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1 1 auto">
+      <a href="Main.dc.html" aria-current="page" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 10px; background: #E3F2EF; color: #0B5E52; font-size: 14px; font-weight: 600; text-decoration: none">Quote</a>
+      <a href="Assistant.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 10px; color: #3F4652; font-size: 14px; font-weight: 500; text-decoration: none">Assistant</a>
+      <a href="MyBookings.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 10px; color: #3F4652; font-size: 14px; font-weight: 500; text-decoration: none">My bookings</a>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #3F4652">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 50%; background: #EEF0F3; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #3F4652">CR</span>
+      <span>Camila Rojas</span>
+      <a href="Login.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; font-size: 14px; font-weight: 500">Sign out</a>
+    </div>
+  </div>
+</header>
+
+<main style="max-width: 1200px; margin: 0 auto; padding: 32px 24px 72px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+  <a href="Main.dc.html" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 600; text-decoration: none">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>
+    Back to quote
+  </a>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+        <span style="display: inline-flex; align-items: center; min-height: 26px; padding: 0 10px; border-radius: 999px; background: #EEF0F3; color: #3F4652; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase">Draft</span>
+        <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 13px; color: #5B6472">BK-1042</span>
+      </div>
+      <h1 style="margin: 0; font-size: 32px; line-height: 1.2; font-weight: 700; letter-spacing: -0.02em">Book Room M1</h1>
+    </div>
+    <p role="status" style="margin: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: #0B5E52">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+      Draft saved · just now
+    </p>
+  </div>
+
+  <nav aria-label="Booking steps">
+    <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px">
+      <li aria-current="step" style="flex: 1 1 200px; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 12px; background: #FFFFFF; border: 2px solid #0E7C6B">
+        <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 50%; background: #0E7C6B; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex: none">1</span>
+        <span style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #5B6472">Step 1 of 3</span><span style="font-size: 15px; font-weight: 700">Your details</span></span>
+      </li>
+      <li style="flex: 1 1 200px; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+        <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 50%; background: #EEF0F3; color: #3F4652; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex: none">2</span>
+        <span style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #5B6472">Step 2 of 3</span><span style="font-size: 15px; font-weight: 600; color: #3F4652">Room &amp; schedule</span></span>
+      </li>
+      <li style="flex: 1 1 200px; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+        <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 50%; background: #EEF0F3; color: #3F4652; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex: none">3</span>
+        <span style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #5B6472">Step 3 of 3</span><span style="font-size: 15px; font-weight: 600; color: #3F4652">Services &amp; confirm</span></span>
+      </li>
+    </ol>
+  </nav>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+    <section aria-labelledby="details-title" style="flex: 999 1 560px; min-width: 0; background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 28px; box-sizing: border-box">
+      <form style="display: flex; flex-direction: column; gap: 20px">
+        <div style="display: flex; flex-direction: column; gap: 4px">
+          <h2 id="details-title" style="margin: 0; font-size: 20px; font-weight: 700">Your details</h2>
+          <p style="margin: 0; font-size: 14px; color: #5B6472">We send the confirmation to this email.</p>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="customer-name" style="font-size: 14px; font-weight: 600">Full name</label>
+          <input id="customer-name" type="text" autocomplete="name" defaultValue="Camila Rojas" style="min-height: 48px; padding: 0 14px; border: 1px solid #8A93A0; border-radius: 10px; background: #FFFFFF; color: #14181F; font-size: 15px">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="customer-email" style="font-size: 14px; font-weight: 600">Email</label>
+          <input id="customer-email" type="email" autocomplete="email" defaultValue="camila.rojas@example.com" style="min-height: 48px; padding: 0 14px; border: 1px solid #8A93A0; border-radius: 10px; background: #FFFFFF; color: #14181F; font-size: 15px">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="customer-company" style="font-size: 14px; font-weight: 600">Company <span style="font-weight: 400; color: #5B6472">(optional)</span></label>
+          <input id="customer-company" type="text" autocomplete="organization" style="min-height: 48px; padding: 0 14px; border: 1px solid #8A93A0; border-radius: 10px; background: #FFFFFF; color: #14181F; font-size: 15px">
+        </div>
+        <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; border-top: 1px solid #E2E5EA; padding-top: 20px">
+          <a href="BookingStep2.dc.html" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 24px; border-radius: 12px; background: #0E7C6B; color: #FFFFFF; font-size: 15px; font-weight: 700; text-decoration: none">Save and continue</a>
+        </div>
+      </form>
+    </section>
+
+    <aside aria-labelledby="snapshot-title" style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+      <div style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+        <h2 id="snapshot-title" style="margin: 0; font-size: 16px; font-weight: 700">Your quote</h2>
+        <dl style="margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+          <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #5B6472">Room</dt><dd style="margin: 0; font-weight: 600">Room M1 (Medium)</dd></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #5B6472">Date</dt><dd style="margin: 0; font-weight: 600">Sat, Oct 31</dd></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #5B6472">Time</dt><dd style="margin: 0; font-family: 'DM Mono', ui-monospace, monospace">14:00–18:00</dd></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid #E2E5EA; padding-top: 10px"><dt style="font-weight: 700">Total</dt><dd style="margin: 0; font-family: 'DM Mono', ui-monospace, monospace; font-weight: 500">COP 315,000</dd></div>
+        </dl>
+      </div>
+      <p style="margin: 0; padding: 16px; border-radius: 12px; background: #EEF0F3; font-size: 13px; line-height: 1.5; color: #3F4652">Each step is saved as a draft. You can close this page and pick up where you left off from My bookings.</p>
+    </aside>
+  </div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

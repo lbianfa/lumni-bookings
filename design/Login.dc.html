@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sign in</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0B5E52}a:hover{color:#084A40}
+select,input,textarea,button{font:inherit}
+button{cursor:pointer}
+select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #7CCBBC;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F5F6F8; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #14181F; display: flex; align-items: center; justify-content: center; padding: 48px 16px; box-sizing: border-box">
+  <main style="width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 24px">
+    <div style="display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 9px; background: #0E7C6B; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-size: 17px">L</span>
+      Lumni
+    </div>
+
+    <section aria-labelledby="signin-title" style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 32px; display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <h1 id="signin-title" style="margin: 0; font-size: 28px; font-weight: 700; letter-spacing: -0.02em">Sign in</h1>
+        <p style="margin: 0; font-size: 15px; color: #5B6472">Book rooms and manage your reservations.</p>
+      </div>
+
+      <form style="display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="signin-email" style="font-size: 14px; font-weight: 600">Email</label>
+          <input id="signin-email" type="email" autocomplete="email" placeholder="you@company.com" style="min-height: 48px; padding: 0 14px; border: 1px solid #8A93A0; border-radius: 10px; background: #FFFFFF; color: #14181F; font-size: 15px">
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <label for="signin-password" style="font-size: 14px; font-weight: 600">Password</label>
+          <input id="signin-password" type="password" autocomplete="current-password" style="min-height: 48px; padding: 0 14px; border: 1px solid #8A93A0; border-radius: 10px; background: #FFFFFF; color: #14181F; font-size: 15px">
+        </div>
+        <a href="Main.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 12px; background: #0E7C6B; color: #FFFFFF; font-size: 16px; font-weight: 700; text-decoration: none">Sign in</a>
+      </form>
+    </section>
+
+    <section aria-labelledby="demo-title" style="border: 1px dashed #8A93A0; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+      <h2 id="demo-title" style="margin: 0; font-size: 14px; font-weight: 700">Demo accounts</h2>
+      <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #5B6472">Two seeded users are available for this demo.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <a href="Main.dc.html" style="flex: 1 1 160px; display: flex; align-items: center; justify-content: center; min-height: 44px; border-radius: 10px; border: 1px solid #0E7C6B; color: #0B5E52; font-size: 14px; font-weight: 600; text-decoration: none">Continue as customer</a>
+        <a href="AdminBookings.dc.html" style="flex: 1 1 160px; display: flex; align-items: center; justify-content: center; min-height: 44px; border-radius: 10px; border: 1px solid #0E7C6B; color: #0B5E52; font-size: 14px; font-weight: 600; text-decoration: none">Continue as admin</a>
+      </div>
+    </section>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

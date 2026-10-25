@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Booking, step 3: services and confirmation</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0B5E52}a:hover{color:#084A40}
+select,input,textarea,button{font:inherit}
+button{cursor:pointer}
+select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #7CCBBC;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F5F6F8; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #14181F">
+
+<header style="background: #FFFFFF; border-bottom: 1px solid #E2E5EA">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 8px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px">
+    <a href="Main.dc.html" style="display: inline-flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: #14181F; font-weight: 700; font-size: 18px">
+      <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 8px; background: #0E7C6B; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-size: 15px">L</span>
+      Lumni
+    </a>
+    <nav aria-label="Main" style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1 1 auto">
+      <a href="Main.dc.html" aria-current="page" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 10px; background: #E3F2EF; color: #0B5E52; font-size: 14px; font-weight: 600; text-decoration: none">Quote</a>
+      <a href="Assistant.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 10px; color: #3F4652; font-size: 14px; font-weight: 500; text-decoration: none">Assistant</a>
+      <a href="MyBookings.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 10px; color: #3F4652; font-size: 14px; font-weight: 500; text-decoration: none">My bookings</a>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #3F4652">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 50%; background: #EEF0F3; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #3F4652">CR</span>
+      <span>Camila Rojas</span>
+      <a href="Login.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; font-size: 14px; font-weight: 500">Sign out</a>
+    </div>
+  </div>
+</header>
+
+<main style="max-width: 1200px; margin: 0 auto; padding: 32px 24px 72px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+  <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px">
+        <span style="display: inline-flex; align-items: center; min-height: 26px; padding: 0 10px; border-radius: 999px; background: #EEF0F3; color: #3F4652; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase">Draft</span>
+        <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 13px; color: #5B6472">BK-1042</span>
+      </div>
+      <h1 style="margin: 0; font-size: 32px; line-height: 1.2; font-weight: 700; letter-spacing: -0.02em">Book Room M1</h1>
+    </div>
+    <p role="status" style="margin: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: #0B5E52">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+      Draft saved · just now
+    </p>
+  </div>
+
+  <nav aria-label="Booking steps">
+    <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px">
+      <li style="flex: 1 1 200px; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+        <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 50%; background: #E3F2EF; color: #0B5E52; display: inline-flex; align-items: center; justify-content: center; flex: none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+        </span>
+        <span style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #5B6472">Step 1 of 3 · Done</span><a href="BookingStep1.dc.html" style="font-size: 15px; font-weight: 600">Your details</a></span>
+      </li>
+      <li style="flex: 1 1 200px; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+        <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 50%; background: #E3F2EF; color: #0B5E52; display: inline-flex; align-items: center; justify-content: center; flex: none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+        </span>
+        <span style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #5B6472">Step 2 of 3 · Done</span><a href="BookingStep2.dc.html" style="font-size: 15px; font-weight: 600">Room &amp; schedule</a></span>
+      </li>
+      <li aria-current="step" style="flex: 1 1 200px; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 12px; background: #FFFFFF; border: 2px solid #0E7C6B">
+        <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 50%; background: #0E7C6B; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex: none">3</span>
+        <span style="display: flex; flex-direction: column"><span style="font-size: 12px; color: #5B6472">Step 3 of 3</span><span style="font-size: 15px; font-weight: 700">Services &amp; confirm</span></span>
+      </li>
+    </ol>
+  </nav>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+    <section aria-labelledby="services-title" style="flex: 999 1 560px; min-width: 0; background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <h2 id="services-title" style="margin: 0; font-size: 20px; font-weight: 700">Additional services</h2>
+        <p style="margin: 0; font-size: 14px; color: #5B6472">Optional. Add them now or skip this step.</p>
+      </div>
+      <fieldset style="border: 0; margin: 0; padding: 0; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+        <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Additional services</legend>
+        <label style="display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: 12px; border: 1px solid #8A93A0; cursor: pointer">
+          <input type="checkbox" name="services" value="projector" style="width: 22px; height: 22px; margin: 0; accent-color: #0E7C6B; flex: none">
+          <span style="display: inline-flex; width: 40px; height: 40px; border-radius: 10px; background: #EEF0F3; color: #3F4652; align-items: center; justify-content: center; flex: none">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="10" rx="2"></rect><circle cx="16" cy="12" r="2.5"></circle><path d="M6 17v2M18 17v2"></path></svg>
+          </span>
+          <span style="flex: 1; font-size: 15px; font-weight: 600">Projector</span>
+          <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 14px; color: #3F4652">COP 30,000</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: 12px; border: 1px solid #8A93A0; cursor: pointer">
+          <input type="checkbox" name="services" value="coffee" style="width: 22px; height: 22px; margin: 0; accent-color: #0E7C6B; flex: none">
+          <span style="display: inline-flex; width: 40px; height: 40px; border-radius: 10px; background: #EEF0F3; color: #3F4652; align-items: center; justify-content: center; flex: none">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5z"></path><path d="M17 11h1.5a2.5 2.5 0 0 1 0 5H17"></path><path d="M8 3v3M12 3v3"></path></svg>
+          </span>
+          <span style="flex: 1; font-size: 15px; font-weight: 600">Coffee service</span>
+          <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 14px; color: #3F4652">COP 25,000</span>
+        </label>
+      </fieldset>
+      <div style="display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 12px; border-top: 1px solid #E2E5EA; padding-top: 20px">
+        <a href="BookingStep2.dc.html" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 20px; border-radius: 12px; border: 1px solid #8A93A0; color: #14181F; font-size: 15px; font-weight: 600; text-decoration: none">Back</a>
+      </div>
+    </section>
+
+    <aside aria-labelledby="summary-title" style="flex: 1 1 360px; min-width: 0; background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+      <h2 id="summary-title" style="margin: 0; font-size: 18px; font-weight: 700">Summary</h2>
+      <dl style="margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+        <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #5B6472">Customer</dt><dd style="margin: 0; font-weight: 600; text-align: right">Camila Rojas</dd></div>
+        <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #5B6472">Room</dt><dd style="margin: 0; font-weight: 600">Room M1 (Medium)</dd></div>
+        <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #5B6472">When</dt><dd style="margin: 0; font-weight: 600">Sat, Oct 31 · <span style="font-family: 'DM Mono', ui-monospace, monospace; font-weight: 400">14:00–18:00</span></dd></div>
+        <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #5B6472">Services</dt><dd style="margin: 0; font-weight: 600">None</dd></div>
+      </dl>
+      <dl style="margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; border-top: 1px solid #E2E5EA; padding-top: 16px">
+        <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #3F4652">Base · 4 h × COP 70,000</dt><dd style="margin: 0; font-family: 'DM Mono', ui-monospace, monospace; white-space: nowrap">COP 280,000</dd></div>
+        <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #3F4652">Duration discount (10%)</dt><dd style="margin: 0; font-family: 'DM Mono', ui-monospace, monospace; white-space: nowrap; color: #0B5E52">− COP 28,000</dd></div>
+        <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #3F4652">Saturday surcharge (25%)</dt><dd style="margin: 0; font-family: 'DM Mono', ui-monospace, monospace; white-space: nowrap">+ COP 63,000</dd></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; border-top: 1px solid #E2E5EA; padding-top: 12px"><dt style="font-size: 16px; font-weight: 700">Total</dt><dd style="margin: 0; font-family: 'DM Mono', ui-monospace, monospace; font-size: 24px; font-weight: 500; white-space: nowrap">COP 315,000</dd></div>
+      </dl>
+      <a href="MyBookings.dc.html" style="display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 12px; background: #0E7C6B; color: #FFFFFF; font-size: 16px; font-weight: 700; text-decoration: none">Confirm booking</a>
+      <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #5B6472">Once confirmed, this price is locked and you will get a confirmation email. Clicking twice will not create a second booking.</p>
+    </aside>
+  </div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

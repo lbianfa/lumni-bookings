@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin: bookings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0B5E52}a:hover{color:#084A40}
+select,input,textarea,button{font:inherit}
+button{cursor:pointer}
+button:disabled{cursor:not-allowed}
+select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #7CCBBC;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #F5F6F8; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #14181F">
+
+<header style="background: #14181F; color: #FFFFFF">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 8px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px">
+    <a href="AdminBookings.dc.html" style="display: inline-flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: #FFFFFF; font-weight: 700; font-size: 18px">
+      <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 8px; background: #0E7C6B; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-size: 15px">L</span>
+      Lumni <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #C9CED6">Admin</span>
+    </a>
+    <nav aria-label="Admin" style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1 1 auto">
+      <a href="AdminBookings.dc.html" aria-current="page" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 10px; background: #2A303A; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none">Bookings</a>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #E2E5EA">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 50%; background: #2A303A; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #FFFFFF">AD</span>
+      <span>Admin</span>
+      <a href="Login.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; font-size: 14px; font-weight: 500; color: #9FE0D3">Sign out</a>
+    </div>
+  </div>
+</header>
+
+<main style="max-width: 1200px; margin: 0 auto; padding: 32px 24px 72px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+  <h1 style="margin: 0; font-size: 32px; line-height: 1.2; font-weight: 700; letter-spacing: -0.02em">Bookings</h1>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
+    <div role="group" aria-label="Filter by status" style="display: flex; flex-wrap: wrap; gap: 6px; padding: 4px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E2E5EA">
+      <sc-for list="{{ statusFilters }}" as="f" hint-placeholder-count="5">
+        <sc-if value="{{ f.selected }}" hint-placeholder-val="{{ false }}">
+          <button type="button" aria-pressed="true" onClick="{{ f.pick }}" style="min-height: 40px; padding: 0 14px; border-radius: 9px; border: 0; background: #14181F; color: #FFFFFF; font-size: 14px; font-weight: 600">{{ f.label }}</button>
+        </sc-if>
+        <sc-if value="{{ f.notSelected }}" hint-placeholder-val="{{ true }}">
+          <button type="button" aria-pressed="false" onClick="{{ f.pick }}" style="min-height: 40px; padding: 0 14px; border-radius: 9px; border: 0; background: transparent; color: #3F4652; font-size: 14px; font-weight: 500">{{ f.label }}</button>
+        </sc-if>
+      </sc-for>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; min-width: 200px">
+      <label for="room-filter" style="font-size: 13px; font-weight: 600">Room</label>
+      <select id="room-filter" value="{{ room }}" onChange="{{ pickRoom }}" style="min-height: 44px; padding: 0 12px; border: 1px solid #8A93A0; border-radius: 10px; background: #FFFFFF; color: #14181F; font-size: 14px">
+        <option value="all">All rooms</option>
+        <optgroup label="Small">
+          <option value="Room S1 (Small)">Room S1</option>
+          <option value="Room S2 (Small)">Room S2</option>
+        </optgroup>
+        <optgroup label="Medium">
+          <option value="Room M1 (Medium)">Room M1</option>
+          <option value="Room M2 (Medium)">Room M2</option>
+        </optgroup>
+        <optgroup label="Large">
+          <option value="Room L1 (Large)">Room L1</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
+
+  <div style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; overflow-x: auto">
+    <table style="width: 100%; min-width: 900px; border-collapse: collapse; font-size: 14px">
+      <caption style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap">Bookings, filtered by status and room</caption>
+      <thead>
+        <tr style="background: #F5F6F8; text-align: left">
+          <th scope="col" style="padding: 14px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #3F4652; border-bottom: 1px solid #E2E5EA">Booking</th>
+          <th scope="col" style="padding: 14px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #3F4652; border-bottom: 1px solid #E2E5EA">Customer</th>
+          <th scope="col" style="padding: 14px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #3F4652; border-bottom: 1px solid #E2E5EA">Room</th>
+          <th scope="col" style="padding: 14px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #3F4652; border-bottom: 1px solid #E2E5EA">Schedule</th>
+          <th scope="col" style="padding: 14px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #3F4652; border-bottom: 1px solid #E2E5EA; text-align: right">Total</th>
+          <th scope="col" style="padding: 14px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #3F4652; border-bottom: 1px solid #E2E5EA">Status</th>
+          <th scope="col" style="padding: 14px 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #3F4652; border-bottom: 1px solid #E2E5EA">Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        <sc-for list="{{ rows }}" as="row" hint-placeholder-count="8">
+          <tr style="border-bottom: 1px solid #E2E5EA">
+            <td style="padding: 14px 16px; border-bottom: 1px solid #E2E5EA"><a href="AdminBookingDetail.dc.html" style="font-family: 'DM Mono', ui-monospace, monospace; font-weight: 500">{{ row.id }}</a></td>
+            <td style="padding: 14px 16px; border-bottom: 1px solid #E2E5EA; font-weight: 600">{{ row.customer }}</td>
+            <td style="padding: 14px 16px; border-bottom: 1px solid #E2E5EA">{{ row.room }}</td>
+            <td style="padding: 14px 16px; border-bottom: 1px solid #E2E5EA">{{ row.date }} · <span style="font-family: 'DM Mono', ui-monospace, monospace">{{ row.time }}</span></td>
+            <td style="padding: 14px 16px; border-bottom: 1px solid #E2E5EA; text-align: right; font-family: 'DM Mono', ui-monospace, monospace; white-space: nowrap">{{ row.total }}</td>
+            <td style="padding: 14px 16px; border-bottom: 1px solid #E2E5EA"><span style="display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: {{ row.statusBg }}; color: {{ row.statusFg }}">{{ row.statusLabel }}</span></td>
+            <td style="padding: 14px 16px; border-bottom: 1px solid #E2E5EA"><span style="display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 700; background: {{ row.emailBg }}; color: {{ row.emailFg }}">{{ row.emailLabel }}</span></td>
+          </tr>
+        </sc-for>
+        <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+          <tr>
+            <td colSpan="7" style="padding: 40px 16px; text-align: center; color: #5B6472">No bookings match these filters.</td>
+          </tr>
+        </sc-if>
+      </tbody>
+    </table>
+  </div>
+
+  <nav aria-label="Pagination" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+    <p style="margin: 0; font-size: 14px; color: #5B6472">Page 1 of 6</p>
+    <div style="display: flex; flex-wrap: wrap; gap: 6px">
+      <button type="button" disabled="{{ true }}" style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #E2E5EA; background: #FFFFFF; color: #8A93A0; font-size: 14px">Previous</button>
+      <button type="button" aria-current="page" style="min-width: 44px; min-height: 44px; border-radius: 10px; border: 0; background: #14181F; color: #FFFFFF; font-size: 14px; font-weight: 700">1</button>
+      <button type="button" aria-label="Page 2" style="min-width: 44px; min-height: 44px; border-radius: 10px; border: 1px solid #8A93A0; background: #FFFFFF; color: #14181F; font-size: 14px">2</button>
+      <button type="button" aria-label="Page 3" style="min-width: 44px; min-height: 44px; border-radius: 10px; border: 1px solid #8A93A0; background: #FFFFFF; color: #14181F; font-size: 14px">3</button>
+      <button type="button" style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #8A93A0; background: #FFFFFF; color: #14181F; font-size: 14px">Next</button>
+    </div>
+  </nav>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { status: 'all', room: 'all' };
+  }
+
+  renderVals() {
+    var self = this;
+    var s = this.state;
+    var STATUS = {
+      draft: { label: 'Draft', bg: '#EEF0F3', fg: '#3F4652' },
+      confirmed: { label: 'Confirmed', bg: '#E3F2EF', fg: '#0B5E52' },
+      completed: { label: 'Completed', bg: '#E6EEFB', fg: '#1E40AF' },
+      cancelled: { label: 'Cancelled', bg: '#FDECEA', fg: '#A3271B' }
+    };
+    var EMAIL = {
+      none: { label: 'Not sent', bg: '#F5F6F8', fg: '#5B6472' },
+      sent: { label: 'Sent', bg: '#EEF0F3', fg: '#3F4652' },
+      pending: { label: 'Pending', bg: '#FEF3C7', fg: '#7A3410' },
+      failed: { label: 'Failed · 5/5', bg: '#FDECEA', fg: '#A3271B' }
+    };
+    var DATA = [
+      ['BK-1044', 'Camila Rojas', 'Room M2 (Medium)', 'Sat, Oct 31', '09:00–13:00', 'COP 345,000', 'draft', 'none'],
+      ['BK-1043', 'Juan Torres', 'Room S2 (Small)', 'Mon, Nov 2', '09:00–11:00', 'COP 80,000', 'draft', 'none'],
+      ['BK-1042', 'Camila Rojas', 'Room M1 (Medium)', 'Sat, Oct 31', '14:00–18:00', 'COP 315,000', 'confirmed', 'sent'],
+      ['BK-1041', 'Diego Herrera', 'Room M1 (Medium)', 'Sat, Oct 31', '11:00–14:00', 'COP 262,500', 'confirmed', 'pending'],
+      ['BK-1040', 'Valentina Cruz', 'Room S1 (Small)', 'Fri, Oct 30', '08:00–12:00', 'COP 144,000', 'confirmed', 'sent'],
+      ['BK-1038', 'Laura Méndez', 'Room L1 (Large)', 'Thu, Oct 29', '08:00–16:00', 'COP 768,000', 'confirmed', 'failed'],
+      ['BK-1035', 'Mateo Silva', 'Room M2 (Medium)', 'Wed, Oct 21', '10:00–12:30', 'COP 175,000', 'completed', 'sent'],
+      ['BK-1031', 'Camila Rojas', 'Room L1 (Large)', 'Fri, Oct 16', '09:00–13:00', 'COP 432,000', 'completed', 'sent'],
+      ['BK-1027', 'Camila Rojas', 'Room S2 (Small)', 'Wed, Oct 14', '15:00–17:00', 'COP 80,000', 'cancelled', 'sent']
+    ];
+    var rows = DATA.filter(function (r) {
+      return (s.status === 'all' || r[6] === s.status) && (s.room === 'all' || r[2] === s.room);
+    }).map(function (r) {
+      return {
+        id: r[0], customer: r[1], room: r[2], date: r[3], time: r[4], total: r[5],
+        statusLabel: STATUS[r[6]].label, statusBg: STATUS[r[6]].bg, statusFg: STATUS[r[6]].fg,
+        emailLabel: EMAIL[r[7]].label, emailBg: EMAIL[r[7]].bg, emailFg: EMAIL[r[7]].fg
+      };
+    });
+    var filters = [
+      { id: 'all', label: 'All' },
+      { id: 'draft', label: 'Draft' },
+      { id: 'confirmed', label: 'Confirmed' },
+      { id: 'completed', label: 'Completed' },
+      { id: 'cancelled', label: 'Cancelled' }
+    ];
+    return {
+      statusFilters: filters.map(function (f) {
+        return {
+          label: f.label,
+          selected: f.id === s.status,
+          notSelected: f.id !== s.status,
+          pick: function () { self.setState({ status: f.id }); }
+        };
+      }),
+      room: s.room,
+      pickRoom: function (e) { self.setState({ room: e.target.value }); },
+      rows: rows,
+      empty: rows.length === 0
+    };
+  }
+}
+</script>
+</body>
+</html>

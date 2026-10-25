@@ -1,0 +1,34 @@
+{
+  "v": 3,
+  "createdOnFiles": { "v": 1, "at": "2026-10-25T18:30:00Z" },
+  "title": "Lumni Bookings SPA",
+  "launch": { "view": "canvas" },
+  "pages": [],
+  "boards": {
+    "Login.dc.html": { "x": 0, "y": 0, "w": 1440, "h": 900, "title": "Sign in", "expand": "fill", "is_interactive": true },
+    "Main.dc.html": { "x": 1520, "y": 0, "w": 1440, "h": 1100, "title": "Quote", "expand": "fill", "is_interactive": true },
+    "BookingStep1.dc.html": { "x": 3040, "y": 0, "w": 1440, "h": 1000, "title": "Booking · Step 1 · Customer", "expand": "fill", "is_interactive": true },
+    "BookingStep2.dc.html": { "x": 4560, "y": 0, "w": 1440, "h": 1100, "title": "Booking · Step 2 · Room & schedule", "expand": "fill", "is_interactive": true },
+    "BookingStep3.dc.html": { "x": 6080, "y": 0, "w": 1440, "h": 1100, "title": "Booking · Step 3 · Services & confirm", "expand": "fill", "is_interactive": true },
+    "MyBookings.dc.html": { "x": 7600, "y": 0, "w": 1440, "h": 1100, "title": "My bookings", "expand": "fill", "is_interactive": true },
+    "Assistant.dc.html": { "x": 9120, "y": 0, "w": 1440, "h": 1150, "title": "AI booking assistant", "expand": "fill", "is_interactive": true },
+    "AdminBookings.dc.html": { "x": 0, "y": 1600, "w": 1440, "h": 1100, "title": "Admin · Bookings", "expand": "fill", "is_interactive": true },
+    "AdminBookingDetail.dc.html": { "x": 1520, "y": 1600, "w": 1440, "h": 1300, "title": "Admin · Booking detail", "expand": "fill", "is_interactive": true }
+  },
+  "order": [
+    "Main.dc.html",
+    "Login.dc.html",
+    "BookingStep1.dc.html",
+    "BookingStep2.dc.html",
+    "BookingStep3.dc.html",
+    "MyBookings.dc.html",
+    "Assistant.dc.html",
+    "AdminBookings.dc.html",
+    "AdminBookingDetail.dc.html"
+  ],
+  "notes": {
+    "customerTitle": { "x": 0, "y": -300, "text": "Customer", "kind": "title1", "maxW": 10560 },
+    "adminTitle": { "x": 0, "y": 1300, "text": "Admin", "kind": "title1", "maxW": 2960 }
+  },
+  "designSystems": []
+}

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin: booking BK-1038</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0;background:#F5F6F8}
+a{color:#0B5E52}a:hover{color:#084A40}
+select,input,textarea,button{font:inherit}
+button{cursor:pointer}
+select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #7CCBBC;outline-offset:2px}
+</style>
+</helmet>
+<div style="position: relative; min-height: 100vh; background: #F5F6F8; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #14181F">
+
+<header style="background: #14181F; color: #FFFFFF">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 8px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 32px">
+    <a href="AdminBookings.dc.html" style="display: inline-flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: #FFFFFF; font-weight: 700; font-size: 18px">
+      <span aria-hidden="true" style="width: 28px; height: 28px; border-radius: 8px; background: #0E7C6B; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-size: 15px">L</span>
+      Lumni <span style="font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #C9CED6">Admin</span>
+    </a>
+    <nav aria-label="Admin" style="display: flex; flex-wrap: wrap; gap: 4px; flex: 1 1 auto">
+      <a href="AdminBookings.dc.html" aria-current="page" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: 10px; background: #2A303A; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none">Bookings</a>
+    </nav>
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; color: #E2E5EA">
+      <span aria-hidden="true" style="width: 32px; height: 32px; border-radius: 50%; background: #2A303A; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #FFFFFF">AD</span>
+      <span>Admin</span>
+      <a href="Login.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; font-size: 14px; font-weight: 500; color: #9FE0D3">Sign out</a>
+    </div>
+  </div>
+</header>
+
+<main style="max-width: 1200px; margin: 0 auto; padding: 32px 24px 72px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+  <a href="AdminBookings.dc.html" style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 14px; font-weight: 600; text-decoration: none">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"></path><path d="m12 19-7-7 7-7"></path></svg>
+    All bookings
+  </a>
+
+  <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px">
+      <h1 style="margin: 0; font-family: 'DM Mono', ui-monospace, monospace; font-size: 30px; font-weight: 500; letter-spacing: -0.01em">BK-1038</h1>
+      <sc-if value="{{ active }}" hint-placeholder-val="{{ true }}">
+        <span style="display: inline-flex; align-items: center; min-height: 28px; padding: 0 12px; border-radius: 999px; background: #E3F2EF; color: #0B5E52; font-size: 13px; font-weight: 700">Confirmed</span>
+      </sc-if>
+      <sc-if value="{{ cancelled }}" hint-placeholder-val="{{ false }}">
+        <span style="display: inline-flex; align-items: center; min-height: 28px; padding: 0 12px; border-radius: 999px; background: #FDECEA; color: #A3271B; font-size: 13px; font-weight: 700">Cancelled</span>
+      </sc-if>
+    </div>
+    <sc-if value="{{ active }}" hint-placeholder-val="{{ true }}">
+      <button type="button" onClick="{{ openDialog }}" style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid #A3271B; background: #FFFFFF; color: #A3271B; font-size: 14px; font-weight: 700">Cancel booking</button>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ cancelled }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="padding: 16px 18px; border-radius: 12px; background: #FDECEA; color: #A3271B; font-size: 14px; line-height: 1.5">
+      <strong>Cancelled by Admin.</strong> Reason: “{{ savedReason }}”
+    </div>
+  </sc-if>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+    <div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+      <section aria-labelledby="booking-title" style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+        <h2 id="booking-title" style="margin: 0; font-size: 16px; font-weight: 700">Booking</h2>
+        <dl style="margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; font-size: 14px">
+          <div><dt style="color: #5B6472">Customer</dt><dd style="margin: 4px 0 0; font-weight: 600">Laura Méndez</dd></div>
+          <div><dt style="color: #5B6472">Email</dt><dd style="margin: 4px 0 0; font-weight: 600; overflow-wrap: anywhere">laura.mendez@example.com</dd></div>
+          <div><dt style="color: #5B6472">Company</dt><dd style="margin: 4px 0 0; font-weight: 600">Estudio Norte</dd></div>
+          <div><dt style="color: #5B6472">Room</dt><dd style="margin: 4px 0 0; font-weight: 600">Room L1 (Large)</dd></div>
+          <div><dt style="color: #5B6472">Date</dt><dd style="margin: 4px 0 0; font-weight: 600">Thu, Oct 29, 2026</dd></div>
+          <div><dt style="color: #5B6472">Time</dt><dd style="margin: 4px 0 0; font-family: 'DM Mono', ui-monospace, monospace">08:00–16:00 · 8 h</dd></div>
+          <div><dt style="color: #5B6472">Services</dt><dd style="margin: 4px 0 0; font-weight: 600">None</dd></div>
+        </dl>
+      </section>
+
+      <section aria-labelledby="lines-title" style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px">
+          <h2 id="lines-title" style="margin: 0; font-size: 16px; font-weight: 700">Price</h2>
+          <span style="font-size: 13px; color: #5B6472">Locked at confirmation · Oct 24, 16:02</span>
+        </div>
+        <dl style="margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+          <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #3F4652">Base · 8 h × COP 120,000</dt><dd style="margin: 0; font-family: 'DM Mono', ui-monospace, monospace; white-space: nowrap">COP 960,000</dd></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #3F4652">Duration discount (20%)</dt><dd style="margin: 0; font-family: 'DM Mono', ui-monospace, monospace; white-space: nowrap; color: #0B5E52">− COP 192,000</dd></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px"><dt style="color: #3F4652">Saturday surcharge</dt><dd style="margin: 0; font-family: 'DM Mono', ui-monospace, monospace; white-space: nowrap">COP 0</dd></div>
+          <div style="display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid #E2E5EA; padding-top: 10px"><dt style="font-weight: 700">Total</dt><dd style="margin: 0; font-family: 'DM Mono', ui-monospace, monospace; font-size: 18px; font-weight: 500; white-space: nowrap">COP 768,000</dd></div>
+        </dl>
+      </section>
+
+      <section aria-labelledby="history-title" style="background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px">
+        <h2 id="history-title" style="margin: 0; font-size: 16px; font-weight: 700">Status history</h2>
+        <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; font-size: 14px">
+          <li style="display: flex; gap: 12px"><span aria-hidden="true" style="width: 10px; height: 10px; margin-top: 5px; border-radius: 50%; background: #8A93A0; flex: none"></span><span><strong>Draft</strong> created by the customer · <span style="color: #5B6472">Oct 24, 15:40</span></span></li>
+          <li style="display: flex; gap: 12px"><span aria-hidden="true" style="width: 10px; height: 10px; margin-top: 5px; border-radius: 50%; background: #0E7C6B; flex: none"></span><span><strong>Confirmed</strong> by the customer · <span style="color: #5B6472">Oct 24, 16:02</span></span></li>
+          <sc-if value="{{ cancelled }}" hint-placeholder-val="{{ false }}">
+            <li style="display: flex; gap: 12px"><span aria-hidden="true" style="width: 10px; height: 10px; margin-top: 5px; border-radius: 50%; background: #A3271B; flex: none"></span><span><strong>Cancelled</strong> by Admin · <span style="color: #5B6472">just now</span></span></li>
+          </sc-if>
+        </ol>
+      </section>
+    </div>
+
+    <section aria-labelledby="email-title" style="flex: 1 1 340px; min-width: 0; background: #FFFFFF; border: 1px solid #E2E5EA; border-radius: 16px; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px">
+        <h2 id="email-title" style="margin: 0; font-size: 16px; font-weight: 700; display: inline-flex; align-items: center; gap: 8px">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="m3 7 9 6 9-6"></path></svg>
+          Confirmation email
+        </h2>
+        <span style="display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: 999px; background: #FDECEA; color: #A3271B; font-size: 12px; font-weight: 700">Failed</span>
+      </div>
+      <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #3F4652">All 5 attempts failed. Last error: <span style="font-family: 'DM Mono', ui-monospace, monospace; font-size: 13px">Connection refused by mail server</span></p>
+      <ol style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; font-size: 13px">
+        <li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #E2E5EA"><span>Attempt 1</span><span style="font-family: 'DM Mono', ui-monospace, monospace; color: #3F4652">16:02:05</span></li>
+        <li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #E2E5EA"><span>Attempt 2 <span style="color: #5B6472">· after 30 s</span></span><span style="font-family: 'DM Mono', ui-monospace, monospace; color: #3F4652">16:02:35</span></li>
+        <li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #E2E5EA"><span>Attempt 3 <span style="color: #5B6472">· after 1 min</span></span><span style="font-family: 'DM Mono', ui-monospace, monospace; color: #3F4652">16:03:35</span></li>
+        <li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #E2E5EA"><span>Attempt 4 <span style="color: #5B6472">· after 2 min</span></span><span style="font-family: 'DM Mono', ui-monospace, monospace; color: #3F4652">16:05:35</span></li>
+        <li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #E2E5EA; border-bottom: 1px solid #E2E5EA"><span>Attempt 5 <span style="color: #5B6472">· after 4 min</span></span><span style="font-family: 'DM Mono', ui-monospace, monospace; color: #3F4652">16:09:35</span></li>
+      </ol>
+    </section>
+  </div>
+</main>
+
+<sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+  <div style="position: absolute; inset: 0; background: rgba(20, 24, 31, 0.55); display: flex; justify-content: center; align-items: flex-start; padding: 120px 16px 16px; box-sizing: border-box">
+    <div role="dialog" aria-modal="true" aria-labelledby="cancel-title" aria-describedby="cancel-desc" style="width: 100%; max-width: 480px; background: #FFFFFF; border-radius: 16px; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <h2 id="cancel-title" style="margin: 0; font-size: 20px; font-weight: 700">Cancel BK-1038?</h2>
+        <p id="cancel-desc" style="margin: 0; font-size: 14px; line-height: 1.5; color: #5B6472">Room L1 will be free again on Thu, Oct 29 from 08:00 to 16:00. The customer sees the reason you write here.</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px">
+        <label for="cancel-reason" style="font-size: 14px; font-weight: 600">Reason <span style="font-weight: 400; color: #5B6472">(required)</span></label>
+        <textarea id="cancel-reason" rows="4" value="{{ reason }}" onChange="{{ onReason }}" aria-invalid="{{ invalidAttr }}" aria-describedby="cancel-error" style="min-height: 104px; padding: 12px 14px; border: {{ fieldBorder }}; border-radius: 10px; background: #FFFFFF; color: #14181F; font-size: 15px; resize: vertical; box-sizing: border-box"></textarea>
+        <sc-if value="{{ showError }}" hint-placeholder-val="{{ false }}">
+          <p id="cancel-error" role="alert" style="margin: 0; font-size: 13px; font-weight: 600; color: #A3271B">Write a reason to cancel this booking.</p>
+        </sc-if>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px">
+        <button type="button" onClick="{{ closeDialog }}" style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 1px solid #8A93A0; background: #FFFFFF; color: #14181F; font-size: 14px; font-weight: 600">Keep booking</button>
+        <button type="button" onClick="{{ confirmCancel }}" style="min-height: 44px; padding: 0 18px; border-radius: 12px; border: 0; background: #A3271B; color: #FFFFFF; font-size: 14px; font-weight: 700">Cancel booking</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startOpen":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open: !!props.startOpen, reason: '', tried: false, cancelled: false, savedReason: '' };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.startOpen !== this.props.startOpen) {
+      this.setState({ open: !!this.props.startOpen });
+    }
+  }
+
+  renderVals() {
+    var self = this;
+    var s = this.state;
+    var showError = s.tried && s.reason.trim() === '';
+    return {
+      open: s.open,
+      active: !s.cancelled,
+      cancelled: s.cancelled,
+      savedReason: s.savedReason,
+      reason: s.reason,
+      showError: showError,
+      invalidAttr: showError ? 'true' : 'false',
+      fieldBorder: showError ? '2px solid #A3271B' : '1px solid #8A93A0',
+      openDialog: function () { self.setState({ open: true, tried: false }); },
+      closeDialog: function () { self.setState({ open: false, tried: false }); },
+      onReason: function (e) { self.setState({ reason: e.target.value }); },
+      confirmCancel: function () {
+        var text = self.state.reason.trim();
+        if (text === '') {
+          self.setState({ tried: true });
+          return;
+        }
+        self.setState({ cancelled: true, open: false, savedReason: text, reason: '', tried: false });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
