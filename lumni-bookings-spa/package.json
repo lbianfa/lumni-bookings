@@ -48,5 +48,15 @@
       "esbuild",
       "lightningcss"
     ]
+  },
+  "intent": {
+    "skills": [
+      "@tanstack/react-router",
+      "@tanstack/router-core",
+      "@tanstack/router-plugin",
+      "@tanstack/virtual-file-routes",
+      "@tanstack/table-core",
+      "@tanstack/react-table"
+    ]
   }
 }
