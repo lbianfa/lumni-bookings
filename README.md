@@ -13,9 +13,9 @@ Requirements are summarized in [`CONTEXT.md`](CONTEXT.md) (source: technical ass
 | Layer | Technology |
 |-------|------------|
 | Frontend | React + TypeScript (Vite, TanStack Router, Query, Form, Table) |
-| Backend | NestJS + TypeScript |
+| Backend | NestJS 12 + TypeScript, run locally and deployed with Prisma Composer |
 | Database | PostgreSQL |
-| ORM / migrations | Prisma (features it does not model, such as the D-05 exclusion constraint, go as custom SQL in migrations) |
+| ORM / migrations | Prisma ORM 8 (features it does not model, such as the D-05 exclusion constraint, go in migrations as `rawSql` operations) |
 | AI provider | Pending (P-01) |
 | Email | Resend, behind an `EmailSender` port (D-10) |
 | Background jobs | `@nestjs/schedule`: an in-process scheduled task that processes the email outbox (D-08) |
@@ -66,13 +66,13 @@ This project is developed with the help of an AI assistant. This section records
 
 ### Claude Code skills
 
-Project-level skills live in [`.claude/skills/`](.claude/skills) and are committed as the exact copies that were audited. [`skills-lock.json`](skills-lock.json) records each skill's source and content hash. They were installed with the [`skills`](https://github.com/vercel-labs/skills) CLI (`npx skills add <repo> --skill <name> -a claude-code --copy`).
+Each app keeps its own skills: the frontend ones in [`.claude/skills/`](.claude/skills) at the repository root, and the API ones in [`lumni-bookings-api/.claude/skills/`](lumni-bookings-api/.claude/skills), which Claude Code loads once it works on API files. Third-party skills are committed as the exact copies that were audited. Each folder's `skills-lock.json` ([root](skills-lock.json), [API](lumni-bookings-api/skills-lock.json)) records each skill's source and content hash. They were installed with the [`skills`](https://github.com/vercel-labs/skills) CLI (`npx skills add <repo> --skill <name> -a claude-code --copy`).
 
 | Skill | Source | Used for |
 |-------|--------|----------|
-| `nestjs-best-practices` | [`Kadajett/agent-nestjs-skills`](https://github.com/Kadajett/agent-nestjs-skills) | NestJS mechanics: modules, DI, pipes, guards, config, testing module. |
-| `clean-ddd-hexagonal` | [`ccheney/robust-skills`](https://github.com/ccheney/robust-skills) | Clean Architecture, tactical DDD, ports and adapters. |
-| `prisma-orm-setup` | [`prisma/skills`](https://github.com/prisma/skills) (official) | Prisma ORM 8 setup and PostgreSQL connection. |
+| `nestjs-best-practices` (API) | [`Kadajett/agent-nestjs-skills`](https://github.com/Kadajett/agent-nestjs-skills) | NestJS mechanics: modules, DI, pipes, guards, config, testing module. |
+| `clean-ddd-hexagonal` (API) | [`ccheney/robust-skills`](https://github.com/ccheney/robust-skills) | Clean Architecture, tactical DDD, ports and adapters. |
+| `prisma-8`, `prisma-composer-core-concepts`, `prisma-platform-core-concepts` (API) | Prisma packages (official) | Prisma ORM 8 contracts, migrations and queries; Composer and deployment. Copied by `prisma skills sync` on every `pnpm install`, so they always match the installed version. |
 | `vite` | [`antfu/skills`](https://github.com/antfu/skills) (Anthony Fu, Vite core team) | Vite 8 config and plugins. |
 | `vercel-react-best-practices` | [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills) (official) | React re-render, bundle and rendering performance. Its Next.js and server rules are disabled in [`lumni-bookings-spa/CLAUDE.md`](lumni-bookings-spa/CLAUDE.md). |
 | `tanstack` | [`pedronauck/skills`](https://github.com/pedronauck/skills) (Pedro Nauck) | TanStack Query and Form, which ship no official skills yet. Its Router part is overridden by the official skills. |
@@ -82,7 +82,6 @@ TanStack Router and Table skills are official and ship inside the TanStack npm p
 - **Selection criteria:** the author is an official organization or an identifiable, long-standing maintainer; the content is Markdown only and was read before installing; the installed copy was diffed against the audited copy.
 - **Project rules win:** [`lumni-bookings-api/CLAUDE.md`](lumni-bookings-api/CLAUDE.md) overrides the skills where they conflict: no CQRS or Event Sourcing, no `HttpException` in business code, Prisma only in the infrastructure layer. [`lumni-bookings-spa/CLAUDE.md`](lumni-bookings-spa/CLAUDE.md) does the same for the frontend.
 - **Updating:** `npx skills update` downloads the author's latest version without checking it against the lock hash. Review the diff before committing it.
-- **Pending:** the `prisma-8` skill ships with the Prisma package; add it with `npx prisma skills sync` once Prisma 8 is installed in the API.
 
 ## Guarantees
 

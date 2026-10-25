@@ -6,7 +6,7 @@ import { prismaCloud, prismaState } from "@prisma/composer-prisma-cloud/control"
 
 export default definePrismaConfig({
   skills: {
-    agents: ["claude", "cursor", "agents", "devin"],
+    agents: ["claude"],
   },
   orm: ormConfig({
     contract: "./src/prisma/contract.ts",
