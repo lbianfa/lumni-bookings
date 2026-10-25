@@ -12,7 +12,7 @@ Los requisitos están resumidos en [`CONTEXT.es.md`](CONTEXT.es.md) (fuente: gu�
 
 | Capa | Tecnología |
 |------|------------|
-| Frontend | React + TypeScript (Vite, TanStack Router) |
+| Frontend | React + TypeScript (Vite, TanStack Router, Query, Form, Table) |
 | Backend | NestJS + TypeScript |
 | Base de datos | PostgreSQL |
 | ORM / migraciones | Prisma (lo que no modela, como el exclusion constraint de D-05, va como SQL a mano en las migraciones) |
@@ -73,9 +73,14 @@ Las skills del proyecto están en [`.claude/skills/`](.claude/skills) y se versi
 | `nestjs-best-practices` | [`Kadajett/agent-nestjs-skills`](https://github.com/Kadajett/agent-nestjs-skills) | Mecánica de NestJS: módulos, DI, pipes, guards, configuración, módulo de testing. |
 | `clean-ddd-hexagonal` | [`ccheney/robust-skills`](https://github.com/ccheney/robust-skills) | Clean Architecture, DDD táctico, puertos y adaptadores. |
 | `prisma-orm-setup` | [`prisma/skills`](https://github.com/prisma/skills) (oficial) | Configuración de Prisma ORM 8 y conexión a PostgreSQL. |
+| `vite` | [`antfu/skills`](https://github.com/antfu/skills) (Anthony Fu, core team de Vite) | Configuración y plugins de Vite 8. |
+| `vercel-react-best-practices` | [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills) (oficial) | Rendimiento de React: re-renders, bundle y renderizado. Sus reglas de Next.js y de servidor están desactivadas en [`lumni-bookings-spa/CLAUDE.md`](lumni-bookings-spa/CLAUDE.md). |
+| `tanstack` | [`pedronauck/skills`](https://github.com/pedronauck/skills) (Pedro Nauck) | TanStack Query y Form, que todavía no traen skills oficiales. Su parte de Router queda reemplazada por las skills oficiales. |
+
+Las skills de TanStack Router y Table son oficiales y vienen dentro de los paquetes npm de TanStack, por lo que siempre coinciden con la versión instalada. Las carga [TanStack Intent](https://github.com/TanStack/intent) (`@tanstack/intent`, dependencia de desarrollo de la SPA); `intent.skills` en [`lumni-bookings-spa/package.json`](lumni-bookings-spa/package.json) permite solo los paquetes de Router y Table, y `pnpm exec intent install` escribe las instrucciones de carga en el `CLAUDE.md` de la SPA.
 
 - **Criterios de selección:** el autor es una organización oficial o un mantenedor identificable y con trayectoria; el contenido es solo Markdown y se leyó antes de instalar; la copia instalada se comparó contra la copia auditada.
-- **Las reglas del proyecto tienen prioridad:** [`lumni-bookings-api/CLAUDE.md`](lumni-bookings-api/CLAUDE.md) reemplaza a las skills cuando entran en conflicto: sin CQRS ni Event Sourcing, sin `HttpException` en el código de negocio, Prisma solo en la capa de infraestructura.
+- **Las reglas del proyecto tienen prioridad:** [`lumni-bookings-api/CLAUDE.md`](lumni-bookings-api/CLAUDE.md) reemplaza a las skills cuando entran en conflicto: sin CQRS ni Event Sourcing, sin `HttpException` en el código de negocio, Prisma solo en la capa de infraestructura. [`lumni-bookings-spa/CLAUDE.md`](lumni-bookings-spa/CLAUDE.md) hace lo mismo para el frontend.
 - **Actualización:** `npx skills update` descarga la última versión del autor sin compararla con el hash del lock. Revisar el diff antes de commitearlo.
 - **Pendiente:** la skill `prisma-8` viene con el paquete de Prisma; se agrega con `npx prisma skills sync` cuando Prisma 8 esté instalado en la API.
 
