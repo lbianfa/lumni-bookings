@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-// Step 1 body; an empty company is stored as no company.
+// Step 1 body; the email is lowercased as at sign-in (D-23) and an empty company is stored as no company.
 export class CustomerDetailsRequestDto {
   static readonly schema = z.object({
     fullName: z.string().trim().min(1),
-    email: z.email(),
+    email: z.string().trim().toLowerCase().max(254).pipe(z.email()),
     company: z.string().trim().nullable(),
   });
 
