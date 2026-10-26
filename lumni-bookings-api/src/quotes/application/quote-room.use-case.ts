@@ -1,5 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 
+import type { Transaction } from "../../shared/application/unit-of-work";
 import { Clock } from "../../shared/domain/clock";
 import { checkAvailability, type Availability } from "../domain/core/availability";
 import { BookingRepository } from "../../bookings/domain/repos/booking.repo";
@@ -33,15 +34,17 @@ export class QuoteRoom {
     @Inject(Clock) private readonly clock: Clock,
   ) {}
 
-  async execute(input: QuoteRoomInput): Promise<Quote> {
+  /** Pass `tx` when quoting inside an open unit of work, so the reads share its connection. */
+  async execute(input: QuoteRoomInput, tx?: Transaction): Promise<Quote> {
     const slot = TimeSlot.create(input.date, input.startMinute, input.durationMinutes);
-    const room = await this.rooms.findById(input.roomId);
+    const room = await this.rooms.findById(input.roomId, tx);
     if (!room) throw new RoomNotFoundError();
 
     const booked = await this.bookings.findBlockingIntervals(
       room.id,
       toInstant(slot.date, 0),
       toInstant(slot.date, 24 * 60),
+      tx,
     );
     const price = calculatePrice(room.hourlyRateCents, slot.durationMinutes, dayOfWeek(slot.date) === SATURDAY);
 

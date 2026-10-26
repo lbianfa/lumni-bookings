@@ -37,16 +37,19 @@ src/
       repos/                 #   repository ports (abstract classes), named `<entity>.repo.ts`
       core/                  #   domain logic and value objects (pricing, availability, time slot, business time)
     application/             # use cases and the ports they need
+      helpers/               #   injectable services several use cases share (no `execute`), e.g. access checks, quoting
     infrastructure/          # Prisma repositories (`prisma-<entity>.repo.ts`), external adapters (Resend, AI)
     http/                    # controllers, guards, exception filters; request/response DTOs in http/dtos/
     <feature>.module.ts      # wires ports to adapters
   prisma/                    # Prisma contract, generated types, db client, seed (persistence only)
-  shared/                    # cross-feature kernel (clock, ids, base errors) and http/ helpers (pipes, filters, money formatting) only
+  shared/                    # cross-feature kernel (clock, unit of work, ids, base errors), their adapters, and http/ helpers (pipes, filters, money formatting) only
 module.ts, service.ts        # Prisma Composer app definition (scaffold, root level)
 migrations/                  # Prisma 8 migrations (generated, then reviewed)
 ```
 
-File names are kebab-case (`create-booking.use-case.ts`, `booking.entity.ts`). `auth` is a thin feature (`http` + `infrastructure`): login, logout, and the current user (D-19, D-20). `quotes` has full layers (`POST /api/quotes`). `rooms` and `bookings` own their entity's repository: `RoomsModule` and `BookingsModule` export `RoomRepository` and `BookingRepository`, and `QuotesModule` imports both. `rooms` has full layers too: `GET /api/rooms` goes through the `ListRooms` use case. `bookings` holds, for now, only its repository.
+File names are kebab-case (`create-booking.use-case.ts`, `booking.entity.ts`). `auth` is a thin feature (`http` + `infrastructure`): login, logout, and the current user (D-19, D-20). `quotes` has full layers (`POST /api/quotes`). `rooms` and `bookings` own their entity's repository: `RoomsModule` and `BookingsModule` export `RoomRepository` and `BookingRepository`, and `QuotesModule` imports both. `rooms` has full layers too: `GET /api/rooms` goes through the `ListRooms` use case. `bookings` has full layers and the booking endpoints (`/api/bookings`); since `QuotesModule` imports `BookingsModule`, `BookingsModule` provides `QuoteRoom` itself rather than importing `QuotesModule` back.
+
+Internal modules: the parts of the booking that are separate tables live in their own feature folders, without `http` or `application`: `customers`, `services`, `booking-lines`, `booking-services`. Each has `domain/` (entity and repository port) and `infrastructure/` (Prisma adapter), and its module exports only the repository. Only `bookings` imports them. Writes that span several of these repositories run in one transaction through the `UnitOfWork` port (`src/shared/application/unit-of-work.ts`): `run(work)` hands `work` an opaque `Transaction`, use cases pass it to every repository call, and Prisma adapters query through `ormOf(prisma, tx)` (`src/shared/infrastructure/prisma-unit-of-work.ts`).
 
 ## Where to apply the layers
 
@@ -74,7 +77,8 @@ Clean Architecture is applied selectively. Use the full layers only where busine
 - Always inject with an explicit token: `constructor(@Inject(BookingRepository) private readonly bookings: BookingRepository)`. `pnpm dev` runs through `tsx` (esbuild), which does not emit the decorator metadata Nest needs to inject by type alone; the scaffold injects with explicit tokens everywhere.
 - Bind adapters in the feature module: `{ provide: BookingRepository, useClass: PrismaBookingRepository }`.
 - `PrismaModule` (`src/prisma.module.ts`) is global and imported once in `AppModule`. Inject `PrismaService` directly in infrastructure classes; never add it to a feature module's `providers`, which would create a second instance.
-- Existing ports: `Clock` (`src/shared/domain`, bound to `SystemClock`); `RoomRepository` (`src/rooms/domain/repos`) and `BookingRepository` (`src/bookings/domain/repos`), both with Prisma adapters and exported by their feature module. Planned: `EmailSender` (D-10).
+- Existing ports: `Clock` (`src/shared/domain`, bound to `SystemClock`); `UnitOfWork` (`src/shared/application`, bound to `PrismaUnitOfWork`); `RoomRepository`, `BookingRepository`, `CustomerRepository`, `ServiceRepository`, `BookingLineRepository` and `BookingServiceRepository` (each in its feature's `domain/repos`), all with Prisma adapters and exported by their feature module. Planned: `EmailSender` (D-10).
+- Money columns go through `toCents` / `toNumeric` (`src/shared/infrastructure/numeric.ts`); Postgres constraint errors are detected with `isDatabaseError` (`src/shared/infrastructure/database-error.ts`) and translated into domain errors in the adapter.
 
 ## TypeScript and modules
 

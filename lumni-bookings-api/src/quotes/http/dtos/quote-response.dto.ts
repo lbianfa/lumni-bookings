@@ -4,7 +4,8 @@ import { formatMinute } from "../../domain/core/business-time";
 import type { RoomSize } from "../../../rooms/domain/entities/room";
 import { formatAmount } from "../../../shared/http/money";
 
-function describe(reason: Unavailability, quote: Quote): string {
+/** The message for an unavailability reason; the booking flow reuses it for its `slot_unavailable` errors. */
+export function describeUnavailability(reason: Unavailability, quote: Pick<Quote, "slot" | "room">): string {
   switch (reason.code) {
     case "closed_day":
       return "The coworking is closed on Sundays. Pick a day from Monday to Saturday.";
@@ -55,7 +56,7 @@ export class QuoteResponseDto {
       total: formatAmount(price.totalCents),
     };
     this.available = unavailability === null;
-    this.reason = unavailability ? { code: unavailability.code, message: describe(unavailability, quote) } : null;
+    this.reason = unavailability ? { code: unavailability.code, message: describeUnavailability(unavailability, quote) } : null;
     this.suggestion = suggestion
       ? { startTime: formatMinute(suggestion.startMinute), endTime: formatMinute(suggestion.endMinute) }
       : null;
