@@ -18,6 +18,9 @@
   --color-danger-tint: #fef3f2;
   --color-warning: #7a3410;
   --color-warning-tint: #fef3c7;
+  --color-neutral-tint: #eef0f3;
+  --color-info: #1e40af;
+  --color-info-tint: #e6eefb;
 }
 
 * {

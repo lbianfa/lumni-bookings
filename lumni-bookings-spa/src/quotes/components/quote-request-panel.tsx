@@ -1,9 +1,8 @@
-import type { Room, RoomSize } from '../../rooms/room.types'
+import { RoomOptions } from '../../rooms/components/room-options'
+import type { Room } from '../../rooms/room.types'
 import { MAX_DURATION_MINUTES, MIN_DURATION_MINUTES } from '../business-time'
 import { SIZE_LABELS, formatCop, formatHours } from '../format'
 import { DateField } from './date-field'
-
-const SIZES: RoomSize[] = ['small', 'medium', 'large']
 
 const fieldClass =
   'min-h-12 rounded-[10px] border border-line-strong bg-white px-3 text-[15px] text-ink'
@@ -55,22 +54,7 @@ export function QuoteRequestPanel({
           aria-describedby="quote-room-info"
           className={fieldClass}
         >
-          {SIZES.map((size) => {
-            const group = rooms.filter((candidate) => candidate.size === size)
-            if (group.length === 0) return null
-            return (
-              <optgroup
-                key={size}
-                label={`${SIZE_LABELS[size]} · ${formatCop(group[0].hourlyRate)} / hour`}
-              >
-                {group.map((candidate) => (
-                  <option key={candidate.id} value={candidate.id}>
-                    {candidate.name}
-                  </option>
-                ))}
-              </optgroup>
-            )
-          })}
+          <RoomOptions rooms={rooms} />
         </select>
         <p
           id="quote-room-info"

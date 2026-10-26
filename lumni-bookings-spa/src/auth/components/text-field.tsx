@@ -1,9 +1,11 @@
 interface TextFieldProps {
   id: string
   label: string
-  type: 'email' | 'password'
+  type: 'text' | 'email' | 'password'
   autoComplete: string
   placeholder?: string
+  /** Marks the label "(optional)" and drops `required`. */
+  optional?: boolean
   value: string
   error: string | undefined
   onBlur: () => void
@@ -13,6 +15,7 @@ interface TextFieldProps {
 export function TextField({
   id,
   label,
+  optional = false,
   error,
   onChange,
   ...input
@@ -22,10 +25,13 @@ export function TextField({
     <div className="flex flex-col gap-2">
       <label htmlFor={id} className="text-sm font-semibold">
         {label}
+        {optional && (
+          <span className="font-normal text-muted"> (optional)</span>
+        )}
       </label>
       <input
         id={id}
-        required
+        required={!optional}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         onChange={(event) => onChange(event.target.value)}

@@ -10,6 +10,10 @@ interface QuoteSummaryProps {
   isUpdating: boolean
   errorMessage: string | undefined
   onUseSuggestion: (startTime: string) => void
+  /** Creates a draft booking from the quoted selection. */
+  onStartBooking: () => void
+  isStartingBooking: boolean
+  startBookingError: string | undefined
 }
 
 export function QuoteSummary({
@@ -19,6 +23,9 @@ export function QuoteSummary({
   isUpdating,
   errorMessage,
   onUseSuggestion,
+  onStartBooking,
+  isStartingBooking,
+  startBookingError,
 }: QuoteSummaryProps) {
   return (
     <aside
@@ -45,7 +52,17 @@ export function QuoteSummary({
           {pendingMessage}
         </p>
       ) : (
-        <QuoteDetails quote={quote} onUseSuggestion={onUseSuggestion} />
+        <QuoteDetails
+          quote={quote}
+          onUseSuggestion={onUseSuggestion}
+          startBooking={{
+            // A quote still on screen while the next one loads describes the previous selection.
+            disabled: isUpdating || isStartingBooking,
+            isPending: isStartingBooking,
+            error: startBookingError,
+            onStart: onStartBooking,
+          }}
+        />
       )}
 
       <p className="m-0 text-[13px] leading-normal text-muted">
@@ -59,9 +76,16 @@ export function QuoteSummary({
 function QuoteDetails({
   quote,
   onUseSuggestion,
+  startBooking,
 }: {
   quote: Quote
   onUseSuggestion: (startTime: string) => void
+  startBooking: {
+    disabled: boolean
+    isPending: boolean
+    error: string | undefined
+    onStart: () => void
+  }
 }) {
   const { price, room, suggestion } = quote
   const discounted = price.discountPercent > 0
@@ -114,31 +138,50 @@ function QuoteDetails({
       </dl>
 
       {quote.available ? (
-        <div
-          role="status"
-          className="flex gap-3 rounded-xl bg-brand-tint px-4 py-3.5 text-brand-strong"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-            className="mt-0.5 flex-none"
+        <>
+          <div
+            role="status"
+            className="flex gap-3 rounded-xl bg-brand-tint px-4 py-3.5 text-brand-strong"
           >
-            <path d="M20 6 9 17l-5-5" />
-          </svg>
-          <div>
-            <p className="m-0 font-bold">Available</p>
-            <p className="mt-1 mb-0 text-sm leading-snug">
-              {room.name} ({SIZE_LABELS[room.size]}) is free at that time.
-            </p>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className="mt-0.5 flex-none"
+            >
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            <div>
+              <p className="m-0 font-bold">Available</p>
+              <p className="mt-1 mb-0 text-sm leading-snug">
+                {room.name} ({SIZE_LABELS[room.size]}) is free at that time.
+              </p>
+            </div>
           </div>
-        </div>
+          {startBooking.error && (
+            <p
+              role="alert"
+              className="m-0 rounded-xl bg-danger-tint px-4 py-3.5 text-sm text-danger"
+            >
+              {startBooking.error}
+            </p>
+          )}
+          <button
+            type="button"
+            disabled={startBooking.disabled}
+            aria-busy={startBooking.isPending}
+            onClick={startBooking.onStart}
+            className="flex min-h-[52px] items-center justify-center rounded-xl bg-brand text-base font-bold text-white hover:bg-brand-strong disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Start booking
+          </button>
+        </>
       ) : (
         <div
           role="status"

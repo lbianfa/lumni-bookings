@@ -2,6 +2,8 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { ApiError } from '../../api/http-client'
+import { bookingErrorMessage } from '../../bookings/errors'
+import { useStartBookingMutation } from '../../bookings/queries'
 import {
   businessNow,
   formatDateLabel,
@@ -13,6 +15,7 @@ import { QuoteRequestPanel } from '../../quotes/components/quote-request-panel'
 import { QuoteSummary } from '../../quotes/components/quote-summary'
 import { SIZE_LABELS } from '../../quotes/format'
 import { quoteQueryOptions } from '../../quotes/queries'
+import type { QuoteRequest } from '../../quotes/quote.types'
 import { roomsQueryOptions } from '../../rooms/queries'
 
 const DEFAULT_DURATION_MINUTES = 4 * 60
@@ -28,8 +31,19 @@ function errorMessage(error: Error) {
   return 'The quote could not be calculated. Please try again.'
 }
 
+function sameRequest(a: QuoteRequest | undefined, b: QuoteRequest | undefined) {
+  return (
+    a?.roomId === b?.roomId &&
+    a?.date === b?.date &&
+    a?.startTime === b?.startTime &&
+    a?.durationMinutes === b?.durationMinutes
+  )
+}
+
 function QuotePage() {
   const { data: rooms } = useSuspenseQuery(roomsQueryOptions)
+  const navigate = Route.useNavigate()
+  const startBooking = useStartBookingMutation()
   // Unset choices fall back to the defaults below.
   const [roomId, setRoomId] = useState<string>()
   const [selectedDate, setSelectedDate] = useState<string>()
@@ -55,6 +69,25 @@ function QuotePage() {
       ? { roomId: room.id, date, startTime, durationMinutes }
       : undefined
   const quote = useQuery(quoteQueryOptions(request))
+
+  const start = () => {
+    if (!request) return
+    startBooking.mutate(request, {
+      onSuccess: (booking) =>
+        navigate({
+          to: '/bookings/$bookingId',
+          params: { bookingId: booking.id },
+        }),
+    })
+  }
+  // A failure only describes the selection it was made for.
+  const startError =
+    startBooking.error && sameRequest(startBooking.variables, request)
+      ? bookingErrorMessage(
+          startBooking.error,
+          'The booking could not be started. Please try again.',
+        )
+      : undefined
 
   return (
     <>
@@ -103,6 +136,9 @@ function QuotePage() {
             isUpdating={quote.isFetching}
             errorMessage={quote.error ? errorMessage(quote.error) : undefined}
             onUseSuggestion={setSelectedStart}
+            onStartBooking={start}
+            isStartingBooking={startBooking.isPending}
+            startBookingError={startError}
           />
         </div>
       )}
