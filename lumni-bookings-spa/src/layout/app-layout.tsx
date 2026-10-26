@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import type { User } from '../auth/auth.types'
 import { SignOutErrorDialog } from './components/sign-out-error-dialog'
@@ -23,7 +24,10 @@ export function AppLayout({
     <div className="min-h-screen bg-canvas text-ink">
       <header className="border-b border-line bg-white">
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-8 gap-y-2 px-6 py-2">
-          <span className="inline-flex min-h-11 items-center gap-2.5 text-lg font-bold">
+          <Link
+            to="/"
+            className="inline-flex min-h-11 items-center gap-2.5 text-lg font-bold text-ink no-underline"
+          >
             <span
               aria-hidden="true"
               className="inline-flex size-7 items-center justify-center rounded-lg bg-brand text-[15px] text-white"
@@ -31,8 +35,17 @@ export function AppLayout({
               L
             </span>
             Lumni
-          </span>
-          <div className="ml-auto flex items-center gap-2.5 text-sm text-ink-soft">
+          </Link>
+          <nav aria-label="Main" className="flex flex-auto flex-wrap gap-1">
+            <Link
+              to="/"
+              activeOptions={{ exact: true, includeSearch: false }}
+              className="inline-flex min-h-11 items-center rounded-[10px] px-3.5 text-sm font-medium text-ink-soft no-underline aria-[current=page]:bg-brand-tint aria-[current=page]:font-semibold aria-[current=page]:text-brand-strong"
+            >
+              Quote
+            </Link>
+          </nav>
+          <div className="flex items-center gap-2.5 text-sm text-ink-soft">
             <span>{user.email}</span>
             <span className="rounded-full bg-brand-tint px-2.5 py-0.5 text-xs font-semibold text-brand-strong capitalize">
               {user.role}

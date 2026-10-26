@@ -2,6 +2,7 @@
 
 @theme {
   --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, monospace;
   --color-canvas: #f5f6f8;
   --color-ink: #14181f;
   --color-ink-soft: #3f4652;
@@ -15,6 +16,8 @@
   --color-focus: #7ccbbc;
   --color-danger: #b42318;
   --color-danger-tint: #fef3f2;
+  --color-warning: #7a3410;
+  --color-warning-tint: #fef3c7;
 }
 
 * {

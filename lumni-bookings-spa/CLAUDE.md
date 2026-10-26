@@ -33,8 +33,8 @@ These rules override the installed skills when they conflict:
 
 ## Data and URL state
 
-- Server data goes through TanStack Query (installed; the `QueryClient` is not wired into the router yet). Route loaders call `queryClient.ensureQueryData`, and components read with `useSuspenseQuery` (see the `@tanstack/react-router#compositions/router-query` skill).
-- Shareable UI state (selected room, date, filters) lives in search params validated with `validateSearch`, not in component state.
+- Server data goes through TanStack Query, whose `QueryClient` is in the router context. Route loaders call `queryClient.ensureQueryData`, and components read with `useSuspenseQuery` (see the `@tanstack/react-router#compositions/router-query` skill).
+- Page selections (selected room, date, filters) live in component state (`useState`), not in URL search params. Search params are only for values that must survive a navigation, such as the login `redirect`.
 
 ## Commands
 
