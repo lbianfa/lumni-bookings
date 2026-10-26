@@ -14,6 +14,10 @@ const config = defineConfig({
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     viteReact(),
   ],
+  server: {
+    // The API serves everything under its own /api prefix, so no rewrite.
+    proxy: { '/api': 'http://localhost:3001' },
+  },
 })
 
 export default config
