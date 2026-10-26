@@ -38,6 +38,9 @@ importers:
       alchemy:
         specifier: 2.0.0-beta.83
         version: 2.0.0-beta.83(fcd6ede47e093bf135d4b7ffbdcf3606)
+      dotenv:
+        specifier: ^18.0.9
+        version: 18.0.9
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -1884,6 +1887,11 @@ packages:
   dotenv@17.4.2:
     resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
     engines: {node: '>=12'}
+
+  dotenv@18.0.9:
+    resolution: {integrity: sha512-3fVOW4cB02R066PUSwn8O4TJyz9NckQl7F81blIbaq9jKBm2tSmOKky7ZHIXzGvkVPXCSn6jkpziBPZdGFs8Tw==}
+    engines: {node: '>=12'}
+    hasBin: true
 
   dts-resolver@3.0.0:
     resolution: {integrity: sha512-1T1f+z+4tl9XD+m+0HBgWoL/nm0bOIffyWaUuUSBlFg/86IWvfx+wjNaO/ybU0AJzG9/Mi5hBUgGV6zCmWEN7Q==}
@@ -4866,6 +4874,8 @@ snapshots:
   detect-libc@2.1.2: {}
 
   dotenv@17.4.2: {}
+
+  dotenv@18.0.9: {}
 
   dts-resolver@3.0.0: {}
 

@@ -33,6 +33,7 @@
     "@prisma/composer-prisma-cloud": "0.34.0",
     "@prisma/orm-postgres": "8.0.0-rc.20",
     "alchemy": "2.0.0-beta.83",
+    "dotenv": "^18.0.9",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
     "temporal-polyfill": "^1.0.6"
