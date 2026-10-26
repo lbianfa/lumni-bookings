@@ -1,36 +1,25 @@
-import { defineContract } from '@prisma/orm-postgres/contract-builder';
+import { defineContract, enumType, member } from '@prisma/orm-postgres/contract-builder';
 
-export const contract = defineContract({}, ({ field, model, rel }) => {
+const UserRole = enumType(
+  'UserRole',
+  { codecId: 'pg/text@1', nativeType: 'text' },
+  member('Customer', 'customer'),
+  member('Admin', 'admin'),
+);
+
+export const contract = defineContract({ enums: { UserRole } }, ({ field, model }) => {
   const User = model('User', {
     fields: {
       id: field.id.uuidv7String(),
       email: field.text().unique(),
-      username: field.text().optional(),
-      name: field.text().optional(),
-      createdAt: field.temporal.createdAtString(),
-      updatedAt: field.temporal.updatedAtString(),
-    },
-  });
-
-  const Post = model('Post', {
-    fields: {
-      id: field.id.uuidv7String(),
-      title: field.text(),
-      content: field.text().optional(),
-      authorId: field.uuidString(),
+      passwordHash: field.text(),
+      role: field.namedType(UserRole),
       createdAt: field.temporal.createdAtString(),
       updatedAt: field.temporal.updatedAtString(),
     },
   });
 
   return {
-    models: {
-      User: User.relations({
-        posts: rel.hasMany(Post, { by: 'authorId' }),
-      }),
-      Post: Post.relations({
-        author: rel.belongsTo(User, { from: 'authorId', to: 'id' }),
-      }),
-    },
+    models: { User },
   };
 });

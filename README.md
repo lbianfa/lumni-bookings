@@ -44,12 +44,14 @@ Requirements stated explicitly in the guide are specifications and live in [`CON
 | D-16 | A `@nestjs/schedule` task moves `confirmed` bookings to `completed` once `ends_at` has passed. | No manual step for the admin; reuses the scheduler already used for emails (D-08). | Own decision |
 | D-17 | Only the admin can cancel a booking, always with a reason. Customers cannot cancel. | The guide only describes cancellation from the admin view. | Own decision |
 | D-18 | Drafts are never deleted. A draft keeps its quoted price and when it was quoted (`quoted_at`). It can be confirmed if that price matches the price recomputed with the current room rate and service prices; if prices changed, only while the quote is less than two weeks old, and the quoted price is honored. Otherwise the customer must quote again. | Keeps the full history; a quote stays valid for two weeks, and after that only while prices have not changed. | Own decision |
+| D-19 | Sessions use a JWT signed by the API and stored in an httpOnly, `SameSite=Lax` cookie (`Secure` in production), valid for 8 hours. The SPA calls the API under `/api` on the same origin (Vite proxy in development), so there is no CORS. Passwords are stored as bcrypt hashes (`bcryptjs`, cost 12). Wrong email and wrong password return the same `401`. | JavaScript cannot read the token, so an XSS cannot steal it; the API stays stateless. Logout clears the cookie, but a token cannot be revoked before it expires. | Own decision |
+| D-20 | Two seeded demo users: `customer@lumni.test` (customer) and `admin@lumni.test` (admin), both with password `lumni-demo`. The login page offers one-click demo buttons that use them. | The guide asks for two seeded users; fixed, documented credentials make the demo usable without setup. | Own decision |
 ## Pending decisions
 
 | ID | Question | Notes |
 |----|----------|-------|
 | P-01 | AI provider and model. | Free choice; key goes in an environment variable. |
-| P-02 | Seed data: how many rooms per size, their names and capacities; the two seeded users. | |
+| P-02 | Seed data: how many rooms per size, their names and capacities. | The two seeded users are decided in D-20. |
 
 ## AI usage
 

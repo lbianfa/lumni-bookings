@@ -42,7 +42,7 @@ module.ts, service.ts        # Prisma Composer app definition (scaffold, root le
 migrations/                  # Prisma 8 migrations (generated, then reviewed)
 ```
 
-File names are kebab-case (`create-booking.use-case.ts`, `booking.entity.ts`). The starter `User`/`Post` models, `src/users.*`, `src/prisma/users.ts`, and `src/prisma.service.ts` are scaffold samples: replace them with the real features instead of building on them.
+File names are kebab-case (`create-booking.use-case.ts`, `booking.entity.ts`). `auth` is a thin feature (`http` + `infrastructure`): login, logout, and the current user (D-19, D-20).
 
 ## Where to apply the layers
 
@@ -96,5 +96,6 @@ Clean Architecture is applied selectively. Use the full layers only where busine
 - `pnpm dev`: run with `tsx watch` against `DATABASE_URL` (see `.env.example`).
 - `pnpm dev:composer`: build and run with Composer, which provides a local Prisma Postgres and applies the committed migrations.
 - `pnpm build`: bundle with `tsdown` into `dist/`.
+- `pnpm db:seed`: create or reset the two demo users (D-20).
 - `pnpm contract:emit`, `pnpm migration:plan`, `pnpm migrate`, `pnpm migration:status`: Prisma 8 contract and migration workflow.
 - `pnpm deploy`: deploys to Prisma Compute. Never run it without explicit approval.

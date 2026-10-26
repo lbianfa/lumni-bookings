@@ -44,12 +44,14 @@ Los requisitos que la guía establece explícitamente son especificaciones y est
 | D-16 | Una tarea de `@nestjs/schedule` pasa las reservas `confirmed` a `completed` cuando ya pasó `ends_at`. | Sin pasos manuales para el administrador; reutiliza el planificador que ya se usa para los correos (D-08). | Decisión propia |
 | D-17 | Solo el administrador puede cancelar una reserva, siempre con un motivo. Los clientes no pueden cancelar. | La guía solo describe la cancelación desde la vista del administrador. | Decisión propia |
 | D-18 | Los borradores nunca se eliminan. Un borrador guarda su precio cotizado y cuándo se cotizó (`quoted_at`). Se puede confirmar si ese precio coincide con el que resulta de recalcular con la tarifa actual de la sala y los precios actuales de los servicios; si los precios cambiaron, solo mientras la cotización tenga menos de dos semanas, y se respeta el precio cotizado. En otro caso, el cliente debe volver a cotizar. | Conserva todo el historial; una cotización es válida por dos semanas, y después solo mientras los precios no hayan cambiado. | Decisión propia |
+| D-19 | Las sesiones usan un JWT firmado por la API y guardado en una cookie httpOnly, `SameSite=Lax` (`Secure` en producción), válida por 8 horas. La SPA llama a la API bajo `/api` en el mismo origen (proxy de Vite en desarrollo), así que no hay CORS. Las contraseñas se guardan como hashes bcrypt (`bcryptjs`, costo 12). Un email incorrecto y una contraseña incorrecta devuelven el mismo `401`. | JavaScript no puede leer el token, así que un XSS no puede robarlo; la API sigue sin estado. El logout borra la cookie, pero un token no se puede revocar antes de que expire. | Decisión propia |
+| D-20 | Dos usuarios demo sembrados: `customer@lumni.test` (cliente) y `admin@lumni.test` (administrador), ambos con la contraseña `lumni-demo`. La página de login ofrece botones demo de un clic que los usan. | La guía pide dos usuarios sembrados; credenciales fijas y documentadas hacen que la demo funcione sin configuración. | Decisión propia |
 ## Decisiones pendientes
 
 | ID | Pregunta | Notas |
 |----|----------|-------|
 | P-01 | Proveedor y modelo de IA. | Libre elección; la clave va en una variable de entorno. |
-| P-02 | Datos semilla: cuántas salas hay por tamaño, sus nombres y capacidades; los dos usuarios sembrados. | |
+| P-02 | Datos semilla: cuántas salas hay por tamaño, sus nombres y capacidades. | Los dos usuarios sembrados se decidieron en D-20. |
 
 ## Uso de IA
 

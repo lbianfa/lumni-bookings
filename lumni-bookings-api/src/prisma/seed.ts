@@ -1,29 +1,32 @@
+import "dotenv/config";
+
+import { hashPassword } from "../auth/infrastructure/password-hasher.ts";
 import { connectDatabase, db } from "./db.ts";
 
+// Demo accounts (README, P-02). Re-running the seed resets their password and role.
+const DEMO_PASSWORD = "lumni-demo";
+
 const users = [
-  { email: "alice@prisma.io", username: "alice", name: "Alice" },
-  { email: "bob@prisma.io", username: "bob", name: "Bob" },
-  { email: "carol@prisma.io", username: "carol", name: "Carol" },
-];
+  { email: "customer@lumni.test", role: "customer" },
+  { email: "admin@lumni.test", role: "admin" },
+] as const;
 
-let pendingSeed: Promise<void> | undefined;
-
-async function runSeed(): Promise<void> {
+async function seed(): Promise<void> {
   await connectDatabase();
 
   for (const user of users) {
+    const passwordHash = await hashPassword(DEMO_PASSWORD);
     await db.orm.public.User.upsert({
-      create: user,
-      update: {},
+      create: { ...user, passwordHash },
+      update: { role: user.role, passwordHash },
       conflictOn: { email: user.email },
     });
   }
 }
 
-export function seed(): Promise<void> {
-  pendingSeed ??= runSeed().catch((error: unknown) => {
-    pendingSeed = undefined;
-    throw error;
-  });
-  return pendingSeed;
+try {
+  await seed();
+  console.log(`Seeded ${users.length} users`);
+} finally {
+  await db.close();
 }
