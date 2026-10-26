@@ -6,13 +6,15 @@ export interface BookedInterval {
   readonly endsAt: Date;
 }
 
-// Port: availability reads the room's blocking bookings and the booking flow stores drafts;
+// Port: availability reads the room's blocking bookings, the booking flow stores drafts and My bookings lists them;
 // tests replace it with an in-memory fake.
 export abstract class BookingRepository {
   /** Bookings of the room that block a slot (`confirmed` or `completed`, D-04) and overlap [from, to). */
   abstract findBlockingIntervals(roomId: string, from: Date, to: Date, tx?: Transaction): Promise<BookedInterval[]>;
   abstract create(booking: NewBooking, tx: Transaction): Promise<Booking>;
   abstract findById(id: string, tx?: Transaction): Promise<Booking | null>;
+  /** Every booking of the customer, in any status, newest created first. */
+  abstract findByCustomer(customerId: string, tx?: Transaction): Promise<Booking[]>;
   /** Reads the booking and locks its row until `tx` ends, so writes to the same booking serialize. */
   abstract lockById(id: string, tx: Transaction): Promise<Booking | null>;
   /**

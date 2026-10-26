@@ -16,6 +16,23 @@ export class PrismaBookingServiceRepository extends BookingServiceRepository {
     return rows.map((row) => String(row.serviceId));
   }
 
+  async findServiceIdsByBookings(bookingIds: readonly string[], tx?: Transaction): Promise<Map<string, string[]>> {
+    const byBooking = new Map<string, string[]>();
+    if (bookingIds.length === 0) return byBooking;
+
+    const rows = await ormOf(this.prisma, tx)
+      .public.BookingService.select("bookingId", "serviceId")
+      .where((s) => s.bookingId.in([...bookingIds]))
+      .all();
+    for (const row of rows) {
+      const bookingId = String(row.bookingId);
+      const serviceIds = byBooking.get(bookingId) ?? [];
+      serviceIds.push(String(row.serviceId));
+      byBooking.set(bookingId, serviceIds);
+    }
+    return byBooking;
+  }
+
   async replace(bookingId: string, serviceIds: readonly string[], tx: Transaction): Promise<void> {
     const orm = ormOf(this.prisma, tx);
     await orm.public.BookingService.where({ bookingId }).deleteAll();

@@ -23,10 +23,14 @@ export interface BookingState {
   /** Furthest step reached, where a reopened draft resumes. */
   readonly currentStep: BookingStep;
   readonly confirmedAt: Date | null;
+  /** Why the coworking cancelled it; read from storage, never written by the booking flow. */
+  readonly cancellationReason: string | null;
+  /** When it was stored; set by the database. */
+  readonly createdAt: Date;
 }
 
 /** A booking not stored yet: always a draft at the first step. */
-export type NewBooking = Omit<BookingState, "id">;
+export type NewBooking = Omit<BookingState, "id" | "cancellationReason" | "createdAt">;
 
 export class Booking {
   private constructor(private state: BookingState) {}
@@ -79,6 +83,12 @@ export class Booking {
   }
   get confirmedAt(): Date | null {
     return this.state.confirmedAt;
+  }
+  get cancellationReason(): string | null {
+    return this.state.cancellationReason;
+  }
+  get createdAt(): Date {
+    return this.state.createdAt;
   }
 
   /** The booked interval as a slot on its business date. */

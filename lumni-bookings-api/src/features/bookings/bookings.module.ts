@@ -16,6 +16,7 @@ import { BookingDetailsReader } from "./application/helpers/booking-details";
 import { BookingQuoter } from "./application/helpers/booking-quoter";
 import { ConfirmBooking } from "./application/confirm-booking.use-case";
 import { GetBooking } from "./application/get-booking.use-case";
+import { ListMyBookings } from "./application/list-my-bookings.use-case";
 import { SaveCustomerDetails } from "./application/save-customer-details.use-case";
 import { SaveSchedule } from "./application/save-schedule.use-case";
 import { SaveServices } from "./application/save-services.use-case";
@@ -40,6 +41,7 @@ import { PrismaBookingRepository } from "./infrastructure/prisma-booking.repo";
     BookingDetailsReader,
     StartBooking,
     GetBooking,
+    ListMyBookings,
     SaveCustomerDetails,
     SaveSchedule,
     SaveServices,

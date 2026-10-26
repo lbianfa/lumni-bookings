@@ -26,6 +26,8 @@ const BOOKING_FIELDS = [
   "quotedAt",
   "currentStep",
   "confirmedAt",
+  "cancellationReason",
+  "createdAt",
 ] as const;
 
 interface BookingRow {
@@ -39,6 +41,9 @@ interface BookingRow {
   quotedAt: Temporal.Instant;
   currentStep: number;
   confirmedAt: Temporal.Instant | null;
+  cancellationReason: string | null;
+  /** `timestamptz-string` codec: the timestamp as Postgres writes it, such as `2024-01-02 03:04:05.678+00`. */
+  createdAt: string;
 }
 
 @Injectable()
@@ -82,6 +87,16 @@ export class PrismaBookingRepository extends BookingRepository {
   async findById(id: string, tx?: Transaction): Promise<Booking | null> {
     const row = await ormOf(this.prisma, tx).public.Booking.select(...BOOKING_FIELDS).where({ id }).first();
     return row ? toBooking(row) : null;
+  }
+
+  async findByCustomer(customerId: string, tx?: Transaction): Promise<Booking[]> {
+    // The id (uuidv7, time-ordered) breaks ties between bookings created in the same instant.
+    const rows = await ormOf(this.prisma, tx)
+      .public.Booking.select(...BOOKING_FIELDS)
+      .where({ customerId })
+      .orderBy([(b) => b.createdAt.desc(), (b) => b.id.desc()])
+      .all();
+    return rows.map(toBooking);
   }
 
   async lockById(id: string, tx: Transaction): Promise<Booking | null> {
@@ -139,5 +154,8 @@ function toBooking(row: BookingRow): Booking {
     quotedAt: toDate(row.quotedAt),
     currentStep: row.currentStep as BookingStep,
     confirmedAt: row.confirmedAt ? toDate(row.confirmedAt) : null,
+    cancellationReason: row.cancellationReason ?? null,
+    // Temporal parses the Postgres text form (space separator, hour-only offset) exactly.
+    createdAt: toDate(Temporal.Instant.from(row.createdAt)),
   });
 }
