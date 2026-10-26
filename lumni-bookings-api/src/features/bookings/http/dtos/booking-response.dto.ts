@@ -1,7 +1,12 @@
+import { z } from "zod";
+
 import type { BookingLine } from "../../../booking-lines/domain/entities/booking-line";
 import { formatMinute } from "../../../quotes/domain/core/business-time";
+import { priceSchema } from "../../../quotes/http/dtos/quote-response.dto";
+import { roomSummarySchema } from "../../../rooms/http/dtos/room-response.dto";
 import type { RoomSize } from "../../../rooms/domain/entities/room";
 import { formatAmount } from "../../../../shared/http/money";
+import { amountSchema, timeOfDaySchema } from "../../../../shared/http/openapi";
 import type { BookingDetails } from "../../application/helpers/booking-details";
 import { SERVICE_CONCEPT_PREFIX } from "../../domain/core/booking-price";
 import type { BookingStatus } from "../../domain/core/booking-status";
@@ -16,7 +21,33 @@ function percentOf(part: number, whole: number): number {
   return whole === 0 ? 0 : Math.round((part * 100) / whole);
 }
 
-export class BookingResponseDto {
+const bookingResponseSchema = z.object({
+  id: z.uuid(),
+  reference: z.string().describe("BK-<id> (D-24)"),
+  status: z.enum(["draft", "confirmed", "completed", "cancelled"]),
+  currentStep: z.union([z.literal(1), z.literal(2), z.literal(3)]).describe("Furthest step reached; a reopened draft resumes there"),
+  customer: z.object({ fullName: z.string(), email: z.email(), company: z.string().nullable() }),
+  room: roomSummarySchema,
+  date: z.iso.date(),
+  startTime: timeOfDaySchema,
+  endTime: timeOfDaySchema,
+  durationMinutes: z.int(),
+  startsAt: z.iso.datetime(),
+  endsAt: z.iso.datetime(),
+  price: priceSchema.extend({
+    services: z.array(z.object({ code: z.string(), name: z.string(), price: amountSchema })),
+  }),
+  services: z
+    .array(z.object({ id: z.uuid(), code: z.string(), name: z.string(), price: amountSchema, selected: z.boolean() }))
+    .describe("The whole services catalog at current prices, with the draft's selection"),
+  quotedAt: z.iso.datetime(),
+  confirmedAt: z.iso.datetime().nullable(),
+});
+
+// `schema` documents the response; the class must keep matching it.
+export class BookingResponseDto implements z.infer<typeof bookingResponseSchema> {
+  static readonly schema = bookingResponseSchema;
+
   readonly id: string;
   readonly reference: string;
   readonly status: BookingStatus;

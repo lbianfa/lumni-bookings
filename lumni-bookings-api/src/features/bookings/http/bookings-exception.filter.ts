@@ -16,6 +16,7 @@ import {
   StepNotReachedError,
   UnknownServiceError,
 } from "../domain/exceptions";
+import type { BookingConflictCode } from "./dtos/booking-conflict.dto";
 
 type ErrorBody = { statusCode: number; message: string } & Record<string, unknown>;
 
@@ -25,7 +26,7 @@ function bodyOf(error: DomainError): ErrorBody {
     message: error.message,
     ...extra,
   });
-  const conflict = (code: string) => body(HttpStatus.CONFLICT, { code });
+  const conflict = (code: BookingConflictCode) => body(HttpStatus.CONFLICT, { code });
 
   if (error instanceof BookingNotFoundError || error instanceof RoomNotFoundError) return body(HttpStatus.NOT_FOUND);
   if (error instanceof CustomerRequiredError) return body(HttpStatus.FORBIDDEN);

@@ -1,8 +1,24 @@
+import { z } from "zod";
+
 import { formatAmount } from "../../../../shared/http/money";
+import { amountSchema } from "../../../../shared/http/openapi";
 import type { Room, RoomSize } from "../../domain/entities/room";
 
-// Whitelists the fields sent to clients.
-export class RoomResponseDto {
+const roomResponseSchema = z.object({
+  id: z.uuid(),
+  name: z.string(),
+  size: z.enum(["small", "medium", "large"]),
+  hourlyRate: amountSchema,
+  capacity: z.int(),
+});
+
+/** The room as quotes and bookings show it. */
+export const roomSummarySchema = roomResponseSchema.omit({ capacity: true });
+
+// Whitelists the fields sent to clients; `schema` documents them (the class must keep matching it).
+export class RoomResponseDto implements z.infer<typeof roomResponseSchema> {
+  static readonly schema = roomResponseSchema;
+
   readonly id: string;
   readonly name: string;
   readonly size: RoomSize;

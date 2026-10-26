@@ -1,8 +1,12 @@
+import { z } from "zod";
+
 import type { Quote } from "../../application/quote-room.use-case";
 import { CLOSING_MINUTE, OPENING_MINUTE, type Unavailability } from "../../domain/core/availability";
 import { formatMinute } from "../../domain/core/business-time";
 import type { RoomSize } from "../../../rooms/domain/entities/room";
 import { formatAmount } from "../../../../shared/http/money";
+import { amountSchema, timeOfDaySchema } from "../../../../shared/http/openapi";
+import { roomSummarySchema } from "../../../rooms/http/dtos/room-response.dto";
 
 /** The message for an unavailability reason; the booking flow reuses it for its `slot_unavailable` errors. */
 export function describeUnavailability(reason: Unavailability, quote: Pick<Quote, "slot" | "room">): string {
@@ -20,7 +24,36 @@ export function describeUnavailability(reason: Unavailability, quote: Pick<Quote
   }
 }
 
-export class QuoteResponseDto {
+/** Why a slot is not available; the booking flow answers it as the `reason` of `slot_unavailable`. */
+export const unavailabilityCodeSchema = z.enum(["closed_day", "outside_opening_hours", "in_the_past", "room_booked"]);
+
+/** The price breakdown (D-15); discount and surcharge are positive amounts. */
+export const priceSchema = z.object({
+  base: amountSchema,
+  discountPercent: z.int(),
+  discount: amountSchema,
+  surchargePercent: z.int(),
+  surcharge: amountSchema,
+  total: amountSchema,
+});
+
+const quoteResponseSchema = z.object({
+  room: roomSummarySchema,
+  date: z.iso.date(),
+  startTime: timeOfDaySchema,
+  durationMinutes: z.int(),
+  startsAt: z.iso.datetime(),
+  endsAt: z.iso.datetime(),
+  price: priceSchema,
+  available: z.boolean(),
+  reason: z.object({ code: unavailabilityCodeSchema, message: z.string() }).nullable(),
+  suggestion: z.object({ startTime: timeOfDaySchema, endTime: timeOfDaySchema }).nullable(),
+});
+
+// `schema` documents the response; the class must keep matching it.
+export class QuoteResponseDto implements z.infer<typeof quoteResponseSchema> {
+  static readonly schema = quoteResponseSchema;
+
   readonly room: { id: string; name: string; size: RoomSize; hourlyRate: string };
   readonly date: string;
   readonly startTime: string;

@@ -6,7 +6,7 @@ App de reservas de salas para un coworking: los clientes cotizan y reservan sala
 
 Los requisitos están resumidos en [`CONTEXT.es.md`](CONTEXT.es.md) (fuente: guía de la prueba técnica, Partes 1 y 2).
 
-> Estado: en progreso. Construido hasta ahora en el frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) y la API ([`lumni-bookings-api`](lumni-bookings-api)): inicio de sesión (D-19, D-20) y la cotización de salas (CONTEXT §1.1, D-21, D-22) y el flujo de reserva en 3 pasos (CONTEXT §1.2, D-23–D-25). Siguen la vista de administración, el correo de confirmación y el asistente. Este README registra las decisiones hasta ahora; la sección "Garantías" se completa a medida que se construye cada parte.
+> Estado: en progreso. Construido hasta ahora en el frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) y la API ([`lumni-bookings-api`](lumni-bookings-api)): inicio de sesión (D-19, D-20) y la cotización de salas (CONTEXT §1.1, D-21, D-22) y el flujo de reserva en 3 pasos (CONTEXT §1.2, D-23–D-25), además de la documentación OpenAPI de la API (D-26). Siguen la vista de administración, el correo de confirmación y el asistente. Este README registra las decisiones hasta ahora; la sección "Garantías" se completa a medida que se construye cada parte.
 
 ## Stack tecnológico
 
@@ -19,6 +19,7 @@ Los requisitos están resumidos en [`CONTEXT.es.md`](CONTEXT.es.md) (fuente: gu�
 | Proveedor de IA | Pendiente (P-01) |
 | Correo | Resend, detrás de un puerto `EmailSender` (D-10) |
 | Tareas en segundo plano | `@nestjs/schedule`: una tarea programada dentro del proceso que procesa el outbox de correos (D-08) |
+| Documentación de la API | OpenAPI con `@nestjs/swagger`; Swagger UI en `/api/docs` fuera de producción (D-26) |
 
 ## Decisiones tomadas
 
@@ -51,6 +52,7 @@ Los requisitos que la guía establece explícitamente son especificaciones y est
 | D-23 | Cada usuario cliente tiene exactamente un registro de cliente (`users.customer_id`). El paso 1 de la reserva se precarga con él y al guardar el paso se actualiza; cada reserva lo referencia. Los correos se guardan sin espacios y en minúsculas, igual que al iniciar sesión, así que se rechaza un correo que ya usa otro cliente aunque cambien las mayúsculas. El usuario administrador no tiene cliente y no puede reservar. | Los clientes no vuelven a escribir sus datos en cada reserva, y `customers.email` sigue siendo único como en el esquema de la Parte 3. | Decisión propia |
 | D-24 | Una reserva se muestra a las personas como `BK-<id de la reserva>`. No hay un número de referencia aparte. | El id ya es único e inmutable; un segundo identificador agregaría una columna y una secuencia sin ninguna regla detrás. | Decisión propia |
 | D-25 | Guardar el paso 2 (sala y horario) o el paso 3 (servicios) de un borrador vuelve a verificar y cotizar la reserva con las reglas de la cotización (CONTEXT §1.1, D-21) y los precios actuales de los servicios, guarda el desglose en `booking_lines` y actualiza `quoted_at`. Un paso solo se puede guardar después de los anteriores, y solo mientras la reserva es un borrador. El paso 3 es opcional ("Optional. Add them now or skip this step" en el diseño): un borrador se puede confirmar una vez guardado el paso 2, sin servicios. | El borrador siempre muestra el precio con el que se confirmaría; una vez confirmada, sus líneas no se vuelven a escribir, y eso es lo que compara D-18. | Decisión propia |
+| D-26 | La API sirve su documentación OpenAPI, Swagger UI en `/api/docs` y el JSON en `/api/docs-json`, solo cuando `NODE_ENV` no es `production`; en producción ambos responden `404`. Los cuerpos de las peticiones se documentan con los mismos esquemas zod que los validan, y las respuestas con un esquema zod con el que cada DTO de respuesta debe seguir coincidiendo. | Quienes revisan y el frontend tienen un contrato siempre al día en local y en las previews, sin publicar el mapa de la API en producción. | Decisión propia (exposición elegida por el usuario) |
 ## Decisiones pendientes
 
 | ID | Pregunta | Notas |

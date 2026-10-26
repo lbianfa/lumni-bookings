@@ -6,7 +6,7 @@ Room booking app for a coworking: customers quote and book rooms, admins manage 
 
 Requirements are summarized in [`CONTEXT.md`](CONTEXT.md) (source: technical assessment guide, Parts 1 and 2).
 
-> Status: in progress. Built so far in the frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) and API ([`lumni-bookings-api`](lumni-bookings-api)): sign-in (D-19, D-20) and the room quote (CONTEXT §1.1, D-21, D-22) and the 3-step booking flow (CONTEXT §1.2, D-23–D-25). The admin view, the confirmation email and the assistant come next. This README records decisions so far; the "Guarantees" section is completed as each part is built.
+> Status: in progress. Built so far in the frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) and API ([`lumni-bookings-api`](lumni-bookings-api)): sign-in (D-19, D-20) and the room quote (CONTEXT §1.1, D-21, D-22) and the 3-step booking flow (CONTEXT §1.2, D-23–D-25), plus the OpenAPI docs of the API (D-26). The admin view, the confirmation email and the assistant come next. This README records decisions so far; the "Guarantees" section is completed as each part is built.
 
 ## Tech stack
 
@@ -19,6 +19,7 @@ Requirements are summarized in [`CONTEXT.md`](CONTEXT.md) (source: technical ass
 | AI provider | Pending (P-01) |
 | Email | Resend, behind an `EmailSender` port (D-10) |
 | Background jobs | `@nestjs/schedule`: an in-process scheduled task that processes the email outbox (D-08) |
+| API docs | OpenAPI with `@nestjs/swagger`; Swagger UI at `/api/docs` outside production (D-26) |
 
 ## Decisions taken
 
@@ -51,6 +52,7 @@ Requirements stated explicitly in the guide are specifications and live in [`CON
 | D-23 | Each customer user has exactly one customer record (`users.customer_id`). Step 1 of the booking is prefilled from it, and saving the step updates it; every booking references it. Emails are stored trimmed and lowercased, as at sign-in, so an email already used by another customer is rejected whatever its case. The admin user has no customer and cannot book. | Customers do not retype their details on every booking, and `customers.email` stays unique as in the Part 3 schema. | Own decision |
 | D-24 | A booking is shown to people as `BK-<booking id>`. There is no separate reference number. | The id is already unique and immutable; a second identifier would add a column and a sequence with no rule behind it. | Own decision |
 | D-25 | Saving step 2 (room and schedule) or step 3 (services) of a draft checks and prices the booking again with the quote rules (CONTEXT §1.1, D-21) and the current service prices, stores the breakdown in `booking_lines` and updates `quoted_at`. A step can be saved only after the previous ones, and only while the booking is a draft. Step 3 is optional ("Optional. Add them now or skip this step" in the design): a draft can be confirmed once step 2 is saved, without services. | The draft always shows the price it would be confirmed at; once confirmed, its lines are never written again, which is what D-18 compares against. | Own decision |
+| D-26 | The API serves its OpenAPI docs, Swagger UI at `/api/docs` and the JSON at `/api/docs-json`, only when `NODE_ENV` is not `production`; in production both answer `404`. Request bodies are documented from the same zod schemas that validate them, and responses from a zod schema each response DTO must keep matching. | Reviewers and the frontend get an always current contract locally and in previews, without publishing the API map in production. | Own decision (exposure chosen by the user) |
 ## Pending decisions
 
 | ID | Question | Notes |

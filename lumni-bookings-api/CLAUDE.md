@@ -45,7 +45,7 @@ src/
   auth/                      # session login, logout and guards used by every feature (D-19, D-20)
   prisma/                    # Prisma contract, generated types, db client, seed (persistence only)
   shared/                    # cross-feature kernel (clock, unit of work, ids, base errors), their adapters, and http/ helpers (pipes, filters, money formatting) only
-  main.ts, app.module.ts     # bootstrap; `prisma.module.ts` and `prisma.service.ts` wire the global Prisma client
+  main.ts, app.module.ts     # bootstrap; `swagger.ts` builds the API docs (D-26); `prisma.module.ts` and `prisma.service.ts` wire the global Prisma client
 module.ts, service.ts        # Prisma Composer app definition (scaffold, root level)
 migrations/                  # Prisma 8 migrations (generated, then reviewed)
 ```
@@ -92,6 +92,16 @@ Clean Architecture is applied selectively. Use the full layers only where busine
 - `domain` and `application` throw domain errors (subclasses of a shared `DomainError`), never `HttpException` or its subclasses.
 - Map domain errors to HTTP status codes in an exception filter inside `http/`.
 
+## API docs (OpenAPI)
+
+Swagger UI is served at `/api/docs` and the JSON at `/api/docs-json`, only when `NODE_ENV` is not `production` (D-26); `src/swagger.ts` builds the document. Every new or changed endpoint documents itself with `@nestjs/swagger` decorators and the helpers in `src/shared/http/openapi.ts`:
+
+- Controller: `@ApiTags(...)`, plus `@ApiCookieAuth()` when it uses `SessionGuard`. Route: `@ApiOperation({ summary })`, and `@ApiParam({ name, type, format })` for each path parameter (give `type` explicitly: only the `tsdown` bundle has decorator metadata to infer it).
+- Request body: `@ApiJsonBody(Dto.schema)`, the same zod schema `ZodValidationPipe` validates with. Keep `@Body(new ZodValidationPipe(Dto))`: `@Body({ schema })` is not documented (swagger reads body parameters from decorator type metadata, which `tsx` does not emit) and would bypass the `400` body clients read.
+- Success response: `@ApiOkResponse` / `@ApiCreatedResponse` with `standardSchema: ResponseDto.schema`. Each response DTO declares a module-level zod schema, exposes it as `static readonly schema` and `implements z.infer<typeof schema>`, so TypeScript fails when the class and its docs drift apart.
+- Errors: `@ApiError(status, description, schema?)` for each status the route can answer (`badRequestBodySchema` for `400`; feature-specific `409` bodies such as `bookingConflictSchema(...codes)`).
+- `swagger-ui-dist` is a direct dependency on purpose: `@nestjs/swagger` loads it at runtime with `require`, which the bundle in `dist/` can only resolve from this package's own `node_modules`. Keep its version equal to the one `@nestjs/swagger` depends on.
+
 ## Domain rules to respect
 
 - Business time zone is `America/Bogota`; timestamps are stored as `timestamptz` (D-02). Inject a clock port instead of calling `new Date()` in domain or application code.
@@ -105,7 +115,7 @@ Clean Architecture is applied selectively. Use the full layers only where busine
 
 ## Commands
 
-- `pnpm dev`: run with `tsx watch` against `DATABASE_URL` (see `.env.example`).
+- `pnpm dev`: run with `tsx watch` against `DATABASE_URL` (see `.env.example`); the API docs are at `http://localhost:3001/api/docs`.
 - `pnpm dev:composer`: build and run with Composer, which provides a local Prisma Postgres and applies the committed migrations.
 - `pnpm build`: bundle with `tsdown` into `dist/`.
 - `pnpm db:seed`: create or reset the two demo users (D-20) and the twelve rooms (D-22).
