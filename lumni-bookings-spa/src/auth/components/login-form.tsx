@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form'
-import type { Credentials } from '../api'
+import type { Credentials } from '../auth.types'
 import { TextField } from './text-field'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/

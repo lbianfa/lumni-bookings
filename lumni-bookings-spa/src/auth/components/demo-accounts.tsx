@@ -1,4 +1,4 @@
-import type { Credentials } from '../api'
+import type { Credentials } from '../auth.types'
 
 const DEMO_PASSWORD = 'lumni-demo'
 
