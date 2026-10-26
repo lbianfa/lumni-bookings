@@ -6,7 +6,7 @@ Room booking app for a coworking: customers quote and book rooms, admins manage 
 
 Requirements are summarized in [`CONTEXT.md`](CONTEXT.md) (source: technical assessment guide, Parts 1 and 2).
 
-> Status: in progress. Built so far in the frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) and API ([`lumni-bookings-api`](lumni-bookings-api)): sign-in (D-19, D-20) and the room quote (CONTEXT §1.1, D-21, D-22). The 3-step booking flow comes next. This README records decisions so far; the "Guarantees" section will be completed during implementation.
+> Status: in progress. Built so far in the frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) and API ([`lumni-bookings-api`](lumni-bookings-api)): sign-in (D-19, D-20) and the room quote (CONTEXT §1.1, D-21, D-22) and the 3-step booking flow (CONTEXT §1.2, D-23–D-25). The admin view, the confirmation email and the assistant come next. This README records decisions so far; the "Guarantees" section is completed as each part is built.
 
 ## Tech stack
 
@@ -48,6 +48,9 @@ Requirements stated explicitly in the guide are specifications and live in [`CON
 | D-20 | Two seeded demo users: `customer@lumni.test` (customer) and `admin@lumni.test` (admin), both with password `lumni-demo`. The login page offers one-click demo buttons that use them. | The guide asks for two seeded users; fixed, documented credentials make the demo usable without setup. | Own decision |
 | D-21 | A slot that has already started cannot be quoted or booked; there is no limit on how far ahead. The quote page offers only start times within that day's opening hours and, for today, only those not yet passed. "Now" comes from a clock in `America/Bogota` (D-02). | The guide does not say; booking the past has no business meaning, and a forward limit would be an invented rule. | Own decision |
 | D-22 | Twelve seeded rooms: `Room S1`–`Room S5` small (capacity 4), `Room M1`–`Room M4` medium (capacity 8), `Room L1`–`Room L3` large (capacity 16), each with its size's hourly rate. `pnpm db:seed` creates or resets them by name. | Enough rooms per size to exercise availability and the assistant's capacity matching (D-12). | Own decision |
+| D-23 | Each customer user has exactly one customer record (`users.customer_id`). Step 1 of the booking is prefilled from it, and saving the step updates it; every booking references it. An email already used by another customer is rejected. The admin user has no customer and cannot book. | Customers do not retype their details on every booking, and `customers.email` stays unique as in the Part 3 schema. | Own decision |
+| D-24 | A booking is shown to people as `BK-<booking id>`. There is no separate reference number. | The id is already unique and immutable; a second identifier would add a column and a sequence with no rule behind it. | Own decision |
+| D-25 | Saving step 2 (room and schedule) or step 3 (services) of a draft checks and prices the booking again with the quote rules (CONTEXT §1.1, D-21) and the current service prices, stores the breakdown in `booking_lines` and updates `quoted_at`. A step can be saved only after the previous ones, and only while the booking is a draft. | The draft always shows the price it would be confirmed at; once confirmed, its lines are never written again, which is what D-18 compares against. | Own decision |
 ## Pending decisions
 
 | ID | Question | Notes |
@@ -89,9 +92,12 @@ TanStack Router and Table skills are official and ship inside the TanStack npm p
 
 ## Guarantees
 
-To be completed during implementation, as required by the guide:
+Completed as each part is built, as required by the guide.
 
-- How two concurrent confirmations of the same room and slot result in only one success (see D-05).
-- How a repeated confirmation is neither duplicated nor re-priced (see D-06).
+- **Two customers confirm the same room and slot at the same time: only one succeeds** (D-05). Confirming re-checks availability in the API, but the guarantee is the PostgreSQL exclusion constraint `Booking_room_slot_excl`: no two `confirmed`/`completed` bookings of one room can have overlapping `[starts_at, ends_at)` ranges. Both confirmations may pass the application check; the database commits the first and rejects the second, which the API answers with `409` (`slot_taken`).
+- **A repeated confirmation is neither duplicated nor re-priced** (D-06). Confirming changes the existing draft row (`UPDATE … WHERE status = 'draft'`); it never inserts a booking. The booking row is locked (`SELECT … FOR NO KEY UPDATE`) inside the transaction, so a second confirmation waits for the first, then finds the booking already confirmed and returns it as it is, without recalculating. The price agreed is the one stored in `total` and `booking_lines`, which are not written again after confirmation.
+
+Still to be completed:
+
 - How a confirmed booking produces exactly one email (see D-07 to D-10).
 - How the assistant ignores instructions that try to change its rules (see D-11).

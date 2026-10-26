@@ -6,7 +6,7 @@ App de reservas de salas para un coworking: los clientes cotizan y reservan sala
 
 Los requisitos están resumidos en [`CONTEXT.es.md`](CONTEXT.es.md) (fuente: guía de la prueba técnica, Partes 1 y 2).
 
-> Estado: en progreso. Construido hasta ahora en el frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) y la API ([`lumni-bookings-api`](lumni-bookings-api)): inicio de sesión (D-19, D-20) y la cotización de salas (CONTEXT §1.1, D-21, D-22). Sigue el flujo de reserva en 3 pasos. Este README registra las decisiones hasta ahora; la sección "Garantías" se completará durante la implementación.
+> Estado: en progreso. Construido hasta ahora en el frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) y la API ([`lumni-bookings-api`](lumni-bookings-api)): inicio de sesión (D-19, D-20) y la cotización de salas (CONTEXT §1.1, D-21, D-22) y el flujo de reserva en 3 pasos (CONTEXT §1.2, D-23–D-25). Siguen la vista de administración, el correo de confirmación y el asistente. Este README registra las decisiones hasta ahora; la sección "Garantías" se completa a medida que se construye cada parte.
 
 ## Stack tecnológico
 
@@ -48,6 +48,9 @@ Los requisitos que la guía establece explícitamente son especificaciones y est
 | D-20 | Dos usuarios demo sembrados: `customer@lumni.test` (cliente) y `admin@lumni.test` (administrador), ambos con la contraseña `lumni-demo`. La página de login ofrece botones demo de un clic que los usan. | La guía pide dos usuarios sembrados; credenciales fijas y documentadas hacen que la demo funcione sin configuración. | Decisión propia |
 | D-21 | Un horario que ya empezó no se puede cotizar ni reservar; no hay límite hacia adelante. La página de cotización ofrece solo horas de inicio dentro del horario de apertura de ese día y, para hoy, solo las que aún no pasaron. "Ahora" sale de un reloj en `America/Bogota` (D-02). | La guía no lo dice; reservar en el pasado no tiene sentido de negocio, y un límite hacia adelante sería una regla inventada. | Decisión propia |
 | D-22 | Doce salas sembradas: `Room S1`–`Room S5` pequeñas (capacidad 4), `Room M1`–`Room M4` medianas (capacidad 8), `Room L1`–`Room L3` grandes (capacidad 16), cada una con la tarifa por hora de su tamaño. `pnpm db:seed` las crea o restablece por nombre. | Suficientes salas por tamaño para ejercitar la disponibilidad y la búsqueda por capacidad del asistente (D-12). | Decisión propia |
+| D-23 | Cada usuario cliente tiene exactamente un registro de cliente (`users.customer_id`). El paso 1 de la reserva se precarga con él y al guardar el paso se actualiza; cada reserva lo referencia. Se rechaza un correo que ya usa otro cliente. El usuario administrador no tiene cliente y no puede reservar. | Los clientes no vuelven a escribir sus datos en cada reserva, y `customers.email` sigue siendo único como en el esquema de la Parte 3. | Decisión propia |
+| D-24 | Una reserva se muestra a las personas como `BK-<id de la reserva>`. No hay un número de referencia aparte. | El id ya es único e inmutable; un segundo identificador agregaría una columna y una secuencia sin ninguna regla detrás. | Decisión propia |
+| D-25 | Guardar el paso 2 (sala y horario) o el paso 3 (servicios) de un borrador vuelve a verificar y cotizar la reserva con las reglas de la cotización (CONTEXT §1.1, D-21) y los precios actuales de los servicios, guarda el desglose en `booking_lines` y actualiza `quoted_at`. Un paso solo se puede guardar después de los anteriores, y solo mientras la reserva es un borrador. | El borrador siempre muestra el precio con el que se confirmaría; una vez confirmada, sus líneas no se vuelven a escribir, y eso es lo que compara D-18. | Decisión propia |
 ## Decisiones pendientes
 
 | ID | Pregunta | Notas |
@@ -89,9 +92,12 @@ Las skills de TanStack Router y Table son oficiales y vienen dentro de los paque
 
 ## Garantías
 
-Se completará durante la implementación, tal como lo pide la guía:
+Se completa a medida que se construye cada parte, tal como lo pide la guía.
 
-- Cómo dos confirmaciones concurrentes de la misma sala y horario terminan con un solo éxito (ver D-05).
-- Cómo una confirmación repetida no se duplica ni se vuelve a cotizar (ver D-06).
+- **Dos clientes confirman la misma sala y horario al mismo tiempo: solo uno lo logra** (D-05). Al confirmar, la API vuelve a verificar la disponibilidad, pero la garantía es la restricción de exclusión de PostgreSQL `Booking_room_slot_excl`: dos reservas `confirmed`/`completed` de una misma sala no pueden tener rangos `[starts_at, ends_at)` superpuestos. Ambas confirmaciones pueden pasar la verificación de la aplicación; la base de datos confirma la primera y rechaza la segunda, que la API responde con `409` (`slot_taken`).
+- **Una confirmación repetida no se duplica ni se vuelve a cotizar** (D-06). Confirmar cambia la fila existente del borrador (`UPDATE … WHERE status = 'draft'`); nunca inserta una reserva. La fila de la reserva se bloquea (`SELECT … FOR NO KEY UPDATE`) dentro de la transacción, así que una segunda confirmación espera a la primera, luego encuentra la reserva ya confirmada y la devuelve tal cual, sin recalcular. El precio acordado es el guardado en `total` y `booking_lines`, que no se vuelven a escribir después de confirmar.
+
+Queda por completar:
+
 - Cómo una reserva confirmada produce exactamente un correo (ver D-07 a D-10).
 - Cómo el asistente ignora instrucciones que intentan cambiar sus reglas (ver D-11).
