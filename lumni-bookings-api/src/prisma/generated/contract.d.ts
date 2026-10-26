@@ -23,9 +23,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'fc80b979e2ea10429f01e6bdd864441e9d627a9ba60a79bb194a1efbb641f1f2'>;
+  StorageHashBase<'070ba5217aa9f37eb24353385973b726a35a63bb39f1d26cfcfaafbe91738234'>;
 export type ExecutionHash =
-  ExecutionHashBase<'e2523dd45d274e2c378135207d8abe66365d3ef6dff84bed4a1120dc21d23fe4'>;
+  ExecutionHashBase<'808479d182c82f1138aaea16d6dd78fca356d6ae29bffa7dfc288f52723358fd'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -241,6 +241,18 @@ type ParameterizedOutputTypeFunctions = PgParameterizedOutputTypes;
 type FieldTypeOverrides = {
   readonly public: {
     readonly models: {
+      readonly Booking: {
+        readonly status: {
+          readonly output: 'draft' | 'confirmed' | 'completed' | 'cancelled';
+          readonly input: 'draft' | 'confirmed' | 'completed' | 'cancelled';
+        };
+      };
+      readonly Room: {
+        readonly size: {
+          readonly output: 'small' | 'medium' | 'large';
+          readonly input: 'small' | 'medium' | 'large';
+        };
+      };
       readonly User: {
         readonly role: {
           readonly output: 'customer' | 'admin';
@@ -266,6 +278,18 @@ export type FieldInputTypes = FieldTypesFromDomain<
 >;
 type ColumnTypeOverrides = {
   readonly public: {
+    readonly Booking: {
+      readonly status: {
+        readonly output: 'draft' | 'confirmed' | 'completed' | 'cancelled';
+        readonly input: 'draft' | 'confirmed' | 'completed' | 'cancelled';
+      };
+    };
+    readonly Room: {
+      readonly size: {
+        readonly output: 'small' | 'medium' | 'large';
+        readonly input: 'small' | 'medium' | 'large';
+      };
+    };
     readonly User: {
       readonly role: {
         readonly output: 'customer' | 'admin';
@@ -290,6 +314,27 @@ export type StorageColumnInputTypes = ColumnTypesFromStorage<
 >;
 
 export namespace Models {
+  export type public_Booking = {
+    createdAt: FieldOutputTypes['public']['Booking']['createdAt'];
+    endsAt: FieldOutputTypes['public']['Booking']['endsAt'];
+    id: FieldOutputTypes['public']['Booking']['id'];
+    roomId: FieldOutputTypes['public']['Booking']['roomId'];
+    startsAt: FieldOutputTypes['public']['Booking']['startsAt'];
+    status: FieldOutputTypes['public']['Booking']['status'];
+    updatedAt: FieldOutputTypes['public']['Booking']['updatedAt'];
+    room: public_Room;
+    readonly [RelationKeys]?: 'room';
+  };
+  export type public_Room = {
+    capacity: FieldOutputTypes['public']['Room']['capacity'];
+    createdAt: FieldOutputTypes['public']['Room']['createdAt'];
+    hourlyRate: FieldOutputTypes['public']['Room']['hourlyRate'];
+    id: FieldOutputTypes['public']['Room']['id'];
+    name: FieldOutputTypes['public']['Room']['name'];
+    size: FieldOutputTypes['public']['Room']['size'];
+    updatedAt: FieldOutputTypes['public']['Room']['updatedAt'];
+    readonly [RelationKeys]?: never;
+  };
   export type public_User = {
     createdAt: FieldOutputTypes['public']['User']['createdAt'];
     email: FieldOutputTypes['public']['User']['email'];
@@ -303,6 +348,8 @@ export namespace Models {
 
 export declare const models: {
   public: {
+    Booking: Models.public_Booking;
+    Room: Models.public_Room;
     User: Models.public_User;
   };
 };
@@ -325,6 +372,130 @@ type ContractBase = Omit<
         readonly kind: 'postgres-schema';
         readonly entries: {
           readonly table: {
+            readonly Booking: {
+              columns: {
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly endsAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/char';
+                  readonly codecId: 'sql/char@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 36 };
+                  readonly many: false;
+                };
+                readonly roomId: {
+                  readonly dataType: 'pg/char';
+                  readonly codecId: 'sql/char@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 36 };
+                  readonly many: false;
+                };
+                readonly startsAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'Booking_roomId_idx_fe51d647';
+                  readonly prefix: 'Booking_roomId_idx';
+                  readonly columns: readonly ['roomId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Booking';
+                    readonly columns: readonly ['roomId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Room';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
+            readonly Room: {
+              columns: {
+                readonly capacity: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly hourlyRate: {
+                  readonly dataType: 'pg/numeric';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 14; readonly scale: 2 };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/char';
+                  readonly codecId: 'sql/char@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 36 };
+                  readonly many: false;
+                };
+                readonly name: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly size: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['name'] }];
+              indexes: readonly [];
+              foreignKeys: readonly [];
+            };
             readonly User: {
               columns: {
                 readonly createdAt: {
@@ -372,6 +543,14 @@ type ContractBase = Omit<
             };
           };
           readonly valueSet: {
+            readonly BookingStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['draft', 'confirmed', 'completed', 'cancelled'];
+            };
+            readonly RoomSize: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['small', 'medium', 'large'];
+            };
             readonly UserRole: {
               readonly kind: 'valueSet';
               readonly values: readonly ['customer', 'admin'];
@@ -387,12 +566,150 @@ type ContractBase = Omit<
   readonly target: 'postgres';
   readonly targetFamily: 'sql';
   readonly roots: {
+    readonly Booking: { readonly namespace: 'public' & NamespaceId; readonly model: 'Booking' };
+    readonly Room: { readonly namespace: 'public' & NamespaceId; readonly model: 'Room' };
     readonly User: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
   };
   readonly domain: {
     readonly namespaces: {
       readonly public: {
         readonly models: {
+          readonly Booking: {
+            readonly fields: {
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly endsAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/char@1';
+                  readonly typeParams: { readonly length: 36 };
+                };
+              };
+              readonly roomId: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/char@1';
+                  readonly typeParams: { readonly length: 36 };
+                };
+              };
+              readonly startsAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly room: {
+                readonly to: { readonly namespace: 'public' & NamespaceId; readonly model: 'Room' };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['roomId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'Booking';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly endsAt: { readonly column: 'endsAt' };
+                readonly id: { readonly column: 'id' };
+                readonly roomId: { readonly column: 'roomId' };
+                readonly startsAt: { readonly column: 'startsAt' };
+                readonly status: { readonly column: 'status' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
+          readonly Room: {
+            readonly fields: {
+              readonly capacity: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly hourlyRate: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/numeric@1';
+                  readonly typeParams: { readonly precision: 14; readonly scale: 2 };
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/char@1';
+                  readonly typeParams: { readonly length: 36 };
+                };
+              };
+              readonly name: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly size: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+            };
+            readonly relations: Record<string, never>;
+            readonly storage: {
+              readonly table: 'Room';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly capacity: { readonly column: 'capacity' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly hourlyRate: { readonly column: 'hourlyRate' };
+                readonly id: { readonly column: 'id' };
+                readonly name: { readonly column: 'name' };
+                readonly size: { readonly column: 'size' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
           readonly User: {
             readonly fields: {
               readonly createdAt: {
@@ -446,6 +763,23 @@ type ContractBase = Omit<
           };
         };
         readonly enum: {
+          readonly BookingStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Draft'; readonly value: 'draft' },
+              { readonly name: 'Confirmed'; readonly value: 'confirmed' },
+              { readonly name: 'Completed'; readonly value: 'completed' },
+              { readonly name: 'Cancelled'; readonly value: 'cancelled' },
+            ];
+          };
+          readonly RoomSize: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Small'; readonly value: 'small' },
+              { readonly name: 'Medium'; readonly value: 'medium' },
+              { readonly name: 'Large'; readonly value: 'large' },
+            ];
+          };
           readonly UserRole: {
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
@@ -455,6 +789,17 @@ type ContractBase = Omit<
           };
         };
         readonly enumMemberTypes?: {
+          readonly BookingStatus: readonly [
+            { readonly name: 'Draft'; readonly value: 'draft' },
+            { readonly name: 'Confirmed'; readonly value: 'confirmed' },
+            { readonly name: 'Completed'; readonly value: 'completed' },
+            { readonly name: 'Cancelled'; readonly value: 'cancelled' },
+          ];
+          readonly RoomSize: readonly [
+            { readonly name: 'Small'; readonly value: 'small' },
+            { readonly name: 'Medium'; readonly value: 'medium' },
+            { readonly name: 'Large'; readonly value: 'large' },
+          ];
           readonly UserRole: readonly [
             { readonly name: 'Customer'; readonly value: 'customer' },
             { readonly name: 'Admin'; readonly value: 'admin' },
@@ -495,6 +840,56 @@ type ContractBase = Omit<
     readonly executionHash: ExecutionHash;
     readonly mutations: {
       readonly defaults: readonly [
+        {
+          readonly onCreate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Booking';
+            readonly field: 'createdAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv7'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Booking';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
+          readonly onUpdate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Booking';
+            readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Room';
+            readonly field: 'createdAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv7'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Room';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
+          readonly onUpdate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'Room';
+            readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
         {
           readonly onCreate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
           readonly ref: {
