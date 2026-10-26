@@ -1,10 +1,10 @@
 import { useForm } from '@tanstack/react-form'
-import { formatDateLabel } from '../../quotes/business-time'
-import { SIZE_LABELS, formatCop } from '../../quotes/format'
-import type { Booking } from '../booking.types'
-import { bookingErrorMessage } from '../errors'
-import { useSaveCustomerMutation } from '../queries'
-import { TextField } from '../../auth/components/text-field'
+import { formatDateLabel } from '../../../quotes/business-time'
+import { SIZE_LABELS, formatCop } from '../../../quotes/format'
+import type { Booking } from '../../booking.types'
+import { bookingErrorMessage } from '../../errors'
+import { useSaveCustomerMutation } from '../../queries'
+import { TextField } from '../../../auth/components/text-field'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 

@@ -1,4 +1,4 @@
-import { RoomOptions } from '../../rooms/components/room-options'
+import { RoomOptions } from '../../../rooms/components/room-options'
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import {
@@ -10,16 +10,16 @@ import {
   formatMinute,
   parseTime,
   startTimeOptions,
-} from '../../quotes/business-time'
-import { DateField } from '../../quotes/components/date-field'
-import { SIZE_LABELS, formatCop, formatHours } from '../../quotes/format'
-import { quoteQueryOptions } from '../../quotes/queries'
-import type { Quote } from '../../quotes/quote.types'
-import { roomsQueryOptions } from '../../rooms/queries'
-import type { Booking } from '../booking.types'
-import { bookingErrorMessage } from '../errors'
-import { useSaveScheduleMutation } from '../queries'
-import { PriceBreakdown } from './price-breakdown'
+} from '../../../quotes/business-time'
+import { DateField } from '../../../quotes/components/date-field'
+import { SIZE_LABELS, formatCop, formatHours } from '../../../quotes/format'
+import { quoteQueryOptions } from '../../../quotes/queries'
+import type { Quote } from '../../../quotes/quote.types'
+import { roomsQueryOptions } from '../../../rooms/queries'
+import type { Booking } from '../../booking.types'
+import { bookingErrorMessage } from '../../errors'
+import { useSaveScheduleMutation } from '../../queries'
+import { PriceBreakdown } from '../price-breakdown'
 
 const DURATIONS: number[] = []
 for (

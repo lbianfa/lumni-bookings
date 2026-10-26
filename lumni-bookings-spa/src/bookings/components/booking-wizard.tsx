@@ -3,9 +3,9 @@ import type { Booking } from '../booking.types'
 import { BackToQuoteLink } from './back-to-quote-link'
 import { BookingHeader } from './booking-header'
 import { BookingStepper } from './booking-stepper'
-import { CustomerStep } from './customer-step'
-import { ScheduleStep } from './schedule-step'
-import { ServicesStep } from './services-step'
+import { CustomerStep } from './steps/customer-step'
+import { ScheduleStep } from './steps/schedule-step'
+import { ServicesStep } from './steps/services-step'
 
 interface BookingWizardProps {
   /** A draft: only drafts can be edited. */

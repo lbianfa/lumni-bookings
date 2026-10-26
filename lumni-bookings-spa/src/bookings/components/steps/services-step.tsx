@@ -1,8 +1,8 @@
-import { formatCop } from '../../quotes/format'
-import type { Booking, BookingService } from '../booking.types'
-import { bookingErrorMessage } from '../errors'
-import { useConfirmBookingMutation, useSaveServicesMutation } from '../queries'
-import { BookingSummary } from './booking-summary'
+import { formatCop } from '../../../quotes/format'
+import type { Booking, BookingService } from '../../booking.types'
+import { bookingErrorMessage } from '../../errors'
+import { useConfirmBookingMutation, useSaveServicesMutation } from '../../queries'
+import { BookingSummary } from '../booking-summary'
 
 // Icons for the seeded services (README D-14); any other service shows the generic one.
 function ServiceIcon({ code }: { code: string }) {
