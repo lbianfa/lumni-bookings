@@ -5,6 +5,7 @@ import { DemoAccounts } from '../auth/components/demo-accounts'
 import { LoginForm } from '../auth/components/login-form'
 import { meQueryOptions, useLoginMutation } from '../auth/queries'
 import { safeRedirect } from '../auth/redirect'
+import '../auth/signed-in-state'
 
 export const Route = createFileRoute('/login')({
   validateSearch: (search: Record<string, unknown>): { redirect?: string } => {
@@ -32,7 +33,11 @@ function LoginPage() {
 
   const signIn = (credentials: Credentials) =>
     login.mutate(credentials, {
-      onSuccess: () => navigate({ href: search.redirect ?? '/' }),
+      onSuccess: () =>
+        navigate({
+          href: search.redirect ?? '/',
+          state: (state) => ({ ...state, signedIn: true }),
+        }),
     })
 
   return (

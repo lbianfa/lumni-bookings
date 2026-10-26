@@ -3,7 +3,7 @@ import { Link } from '@tanstack/react-router'
 export function BackToQuoteLink() {
   return (
     <Link
-      to="/"
+      to="/quote"
       className="inline-flex min-h-11 items-center gap-1.5 self-start text-sm font-semibold text-brand-strong no-underline hover:text-brand-deep"
     >
       <svg

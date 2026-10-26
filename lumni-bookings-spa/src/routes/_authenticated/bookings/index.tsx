@@ -20,7 +20,7 @@ function MyBookingsHeader() {
         My bookings
       </h1>
       <Link
-        to="/"
+        to="/quote"
         className="inline-flex min-h-11 items-center justify-center rounded-xl bg-brand px-[18px] text-sm font-bold text-white no-underline hover:bg-brand-strong"
       >
         New quote

@@ -41,7 +41,7 @@ export function AppLayout({
           </Link>
           <nav aria-label="Main" className="flex flex-auto flex-wrap gap-1">
             <Link
-              to="/"
+              to="/quote"
               activeOptions={{ exact: true, includeSearch: false }}
               className={NAV_LINK_CLASS}
             >

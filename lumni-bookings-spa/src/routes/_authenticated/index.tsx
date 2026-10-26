@@ -1,159 +1,119 @@
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import { ApiError } from '../../api/http-client'
-import { bookingErrorMessage } from '../../features/bookings/errors'
-import { useStartBookingMutation } from '../../features/bookings/queries'
-import {
-  businessNow,
-  formatDateLabel,
-  formatMinute,
-  parseTime,
-  startTimeOptions,
-} from '../../features/quotes/business-time'
-import { QuoteRequestPanel } from '../../features/quotes/components/quote-request-panel'
-import { QuoteSummary } from '../../features/quotes/components/quote-summary'
-import { SIZE_LABELS } from '../../features/quotes/format'
-import { quoteQueryOptions } from '../../features/quotes/queries'
-import type { QuoteRequest } from '../../features/quotes/quote.types'
-import { roomsQueryOptions } from '../../features/rooms/queries'
-
-const DEFAULT_DURATION_MINUTES = 4 * 60
+import { useQuery } from '@tanstack/react-query'
+import { createFileRoute, useLocation } from '@tanstack/react-router'
+import '../../auth/signed-in-state'
+import { myBookingsQueryOptions } from '../../features/bookings/queries'
+import { QuickActionCard } from '../../features/home/components/quick-action-card'
+import { ResumeDraftCard } from '../../features/home/components/resume-draft-card'
+import { SignedInNotice } from '../../features/home/components/signed-in-notice'
 
 export const Route = createFileRoute('/_authenticated/')({
-  loader: ({ context }) =>
-    context.queryClient.ensureQueryData(roomsQueryOptions),
-  component: QuotePage,
+  // The draft reminder is optional: its bookings load without holding the page back or failing it.
+  loader: ({ context }) => {
+    if (context.user.role === 'customer') {
+      void context.queryClient.prefetchQuery(myBookingsQueryOptions)
+    }
+  },
+  component: HomePage,
 })
 
-function errorMessage(error: Error) {
-  if (error instanceof ApiError && error.status < 500) return error.message
-  return 'The quote could not be calculated. Please try again.'
-}
-
-function sameRequest(a: QuoteRequest | undefined, b: QuoteRequest | undefined) {
-  return (
-    a?.roomId === b?.roomId &&
-    a?.date === b?.date &&
-    a?.startTime === b?.startTime &&
-    a?.durationMinutes === b?.durationMinutes
-  )
-}
-
-function QuotePage() {
-  const { data: rooms } = useSuspenseQuery(roomsQueryOptions)
+function HomePage() {
+  const { user } = Route.useRouteContext()
   const navigate = Route.useNavigate()
-  const startBooking = useStartBookingMutation()
-  // Unset choices fall back to the defaults below.
-  const [roomId, setRoomId] = useState<string>()
-  const [selectedDate, setSelectedDate] = useState<string>()
-  const [selectedStart, setSelectedStart] = useState<string>()
-  const [durationMinutes, setDurationMinutes] = useState(
-    DEFAULT_DURATION_MINUTES,
-  )
+  const signedIn = useLocation({ select: (l) => l.state.signedIn === true })
 
-  // Normalized on every render, so a choice that time has made stale falls back:
-  // no past dates, only start times left that day (README D-21).
-  const now = businessNow()
-  const room = rooms.find((candidate) => candidate.id === roomId) ?? rooms.at(0)
-  const date =
-    selectedDate && selectedDate >= now.date ? selectedDate : now.date
-  const startTimes = startTimeOptions(date, now)
-  const startTime =
-    selectedStart && startTimes.includes(selectedStart)
-      ? selectedStart
-      : startTimes.at(0)
-
-  const request =
-    room && startTime
-      ? { roomId: room.id, date, startTime, durationMinutes }
-      : undefined
-  const quote = useQuery(quoteQueryOptions(request))
-
-  const start = () => {
-    if (!request) return
-    startBooking.mutate(request, {
-      onSuccess: (booking) =>
-        navigate({
-          to: '/bookings/$bookingId',
-          params: { bookingId: booking.id },
-        }),
+  // Clearing the flag in the history entry keeps the notice away after a reload too.
+  const dismissNotice = () =>
+    navigate({
+      to: '/',
+      replace: true,
+      state: (state) => ({ ...state, signedIn: false }),
     })
-  }
-  // A failure only describes the selection it was made for.
-  const startError =
-    startBooking.error && sameRequest(startBooking.variables, request)
-      ? bookingErrorMessage(
-          startBooking.error,
-          'The booking could not be started. Please try again.',
-        )
-      : undefined
+
+  return (
+    <div className="flex flex-col gap-8 pt-2">
+      {signedIn && <SignedInNotice onDismiss={dismissNotice} />}
+
+      <section aria-labelledby="welcome-title" className="flex flex-col gap-2">
+        <h1
+          id="welcome-title"
+          className="m-0 text-[40px] leading-[1.15] font-bold tracking-[-0.02em] [overflow-wrap:anywhere]"
+        >
+          Welcome back, {user.email}
+        </h1>
+        {user.role === 'customer' && (
+          <p className="m-0 max-w-[640px] text-[17px] leading-normal text-muted">
+            What would you like to do today?
+          </p>
+        )}
+      </section>
+
+      {user.role === 'customer' && <CustomerActions />}
+    </div>
+  )
+}
+
+// The admin's actions come with its bookings table; the assistant's card comes with the assistant.
+function CustomerActions() {
+  const { data: bookings } = useQuery(myBookingsQueryOptions)
+  // Newest created first, so the first draft is the latest one.
+  const draft = bookings?.find((booking) => booking.status === 'draft')
 
   return (
     <>
-      <div className="mb-7 flex flex-col gap-2">
-        <h1 className="m-0 text-4xl leading-tight font-bold tracking-[-0.02em]">
-          Quote a room
-        </h1>
-        <p className="m-0 max-w-[640px] text-base leading-normal text-muted">
-          Pick a room, a day and a time. Price and availability are calculated
-          by the booking rules, so what you see is what you pay.
-        </p>
-      </div>
+      <section
+        aria-label="Quick actions"
+        className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-5"
+      >
+        <QuickActionCard
+          to="/quote"
+          primary
+          title="Quote a room"
+          description="Pick a room, a day and a time, and see the exact price."
+          icon={
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="17" rx="2" />
+              <path d="M3 9h18" />
+              <path d="M8 2v4" />
+              <path d="M16 2v4" />
+            </svg>
+          }
+        />
+        <QuickActionCard
+          to="/bookings"
+          title="My bookings"
+          description="Resume a draft or check the details of a confirmed booking."
+          icon={
+            <svg
+              width="28"
+              height="28"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M8 6h13" />
+              <path d="M8 12h13" />
+              <path d="M8 18h13" />
+              <path d="M3 6h.01" />
+              <path d="M3 12h.01" />
+              <path d="M3 18h.01" />
+            </svg>
+          }
+        />
+      </section>
 
-      {!room ? (
-        <p role="status" className="m-0 text-base text-muted">
-          There are no rooms to quote yet.
-        </p>
-      ) : (
-        <div className="flex flex-wrap items-start gap-6">
-          <QuoteRequestPanel
-            rooms={rooms}
-            room={room}
-            date={date}
-            minDate={now.date}
-            startTime={startTime}
-            startTimes={startTimes}
-            durationMinutes={durationMinutes}
-            onRoomChange={setRoomId}
-            onDateChange={setSelectedDate}
-            onStartTimeChange={setSelectedStart}
-            onDurationChange={setDurationMinutes}
-          />
-          <QuoteSummary
-            heading={describeSelection(
-              `${room.name} (${SIZE_LABELS[room.size]})`,
-              date,
-              startTime,
-              durationMinutes,
-            )}
-            quote={request ? quote.data : undefined}
-            pendingMessage={
-              request
-                ? 'Calculating the price…'
-                : 'Pick a date with start times left to see a quote.'
-            }
-            isUpdating={quote.isFetching}
-            errorMessage={quote.error ? errorMessage(quote.error) : undefined}
-            onUseSuggestion={setSelectedStart}
-            onStartBooking={start}
-            isStartingBooking={startBooking.isPending}
-            startBookingError={startError}
-          />
-        </div>
-      )}
+      {draft && <ResumeDraftCard draft={draft} />}
     </>
   )
-}
-
-function describeSelection(
-  roomLabel: string,
-  date: string,
-  startTime: string | undefined,
-  durationMinutes: number,
-) {
-  const day = `${roomLabel} · ${formatDateLabel(date)}`
-  if (!startTime) return day
-  const end = parseTime(startTime) + durationMinutes
-  return `${day} · ${startTime}–${end < 24 * 60 ? formatMinute(end) : 'next day'}`
 }
