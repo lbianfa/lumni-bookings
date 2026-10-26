@@ -34,10 +34,10 @@ src/
     domain/                  # entities, value objects, domain errors, repository ports
     application/             # use cases and the ports they need
     infrastructure/          # Prisma repositories, external adapters (Resend, AI)
-    http/                    # controllers, request/response DTOs, exception filters
+    http/                    # controllers, guards, exception filters; request/response DTOs in http/dtos/
     <feature>.module.ts      # wires ports to adapters
   prisma/                    # Prisma contract, generated types, db client, seed (persistence only)
-  shared/                    # cross-feature kernel (clock, ids, base errors) only
+  shared/                    # cross-feature kernel (clock, ids, base errors) and http/ helpers (pipes, filters) only
 module.ts, service.ts        # Prisma Composer app definition (scaffold, root level)
 migrations/                  # Prisma 8 migrations (generated, then reviewed)
 ```

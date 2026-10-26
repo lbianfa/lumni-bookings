@@ -13,11 +13,11 @@ import {
 import type { Response } from "express";
 
 import { AuthService } from "../infrastructure/auth.service";
-import { AuthUserResponseDto } from "./auth-user-response.dto";
-import { LoginRequestDto } from "./login-request.dto";
+import { ZodValidationPipe } from "../../shared/http/zod-validation.pipe";
+import { AuthUserResponseDto } from "./dtos/auth-user-response.dto";
+import { LoginRequestDto } from "./dtos/login-request.dto";
 import { SESSION_COOKIE, clearSessionCookieOptions, sessionCookieOptions } from "./session-cookie";
 import { SessionGuard, type AuthenticatedRequest } from "./session.guard";
-import { ZodValidationPipe } from "./zod-validation.pipe";
 
 @Controller("auth")
 export class AuthController {

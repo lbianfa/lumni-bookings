@@ -1,4 +1,4 @@
-import type { AuthUser, UserRole } from "../infrastructure/auth.service";
+import type { AuthUser, UserRole } from "../../infrastructure/auth.service";
 
 // Whitelists the fields sent to clients, so nothing else on the user can leak.
 export class AuthUserResponseDto {
