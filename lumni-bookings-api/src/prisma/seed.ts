@@ -11,6 +11,15 @@ const users = [
   { email: "admin@lumni.test", role: "admin" },
 ] as const;
 
+// The demo customer's own customer row (README, one customer per user); the name matches the designs
+const demoCustomer = { email: "customer@lumni.test", fullName: "Camila Rojas", company: null };
+
+// Additional services with a flat price per booking (README, D-14)
+const services = [
+  { code: "projector", name: "Projector", price: "30000.00" },
+  { code: "coffee", name: "Coffee service", price: "25000.00" },
+] as const;
+
 // Rooms (README, D-22): hourly rate by size (CONTEXT §1.1), capacity for the assistant (D-12).
 const SIZES = {
   small: { prefix: "S", count: 5, capacity: 4, hourlyRate: "40000.00" },
@@ -30,12 +39,27 @@ const rooms = Object.entries(SIZES).flatMap(([size, { prefix, count, capacity, h
 async function seed(): Promise<void> {
   await connectDatabase();
 
+  const customer = await db.orm.public.Customer.upsert({
+    create: demoCustomer,
+    update: { fullName: demoCustomer.fullName, company: demoCustomer.company },
+    conflictOn: { email: demoCustomer.email },
+  });
+
   for (const user of users) {
     const passwordHash = await hashPassword(DEMO_PASSWORD);
+    const customerId = user.role === "customer" ? customer.id : null;
     await db.orm.public.User.upsert({
-      create: { ...user, passwordHash },
-      update: { role: user.role, passwordHash },
+      create: { ...user, passwordHash, customerId },
+      update: { role: user.role, passwordHash, customerId },
       conflictOn: { email: user.email },
+    });
+  }
+
+  for (const service of services) {
+    await db.orm.public.Service.upsert({
+      create: service,
+      update: { name: service.name, price: service.price },
+      conflictOn: { code: service.code },
     });
   }
 
@@ -50,7 +74,7 @@ async function seed(): Promise<void> {
 
 try {
   await seed();
-  console.log(`Seeded ${users.length} users and ${rooms.length} rooms`);
+  console.log(`Seeded ${users.length} users, 1 customer, ${services.length} services and ${rooms.length} rooms`);
 } finally {
   await db.close();
 }
