@@ -27,7 +27,7 @@ Branch: `main` (user convention: work-unit commits directly on main, no PR). Del
 | T1 | S3 | inline | done | L8, L10; commit 3bb8db4 |
 | T2 | S4, S8 | inline | done | L5, L9, L10; commit 3bb8db4 |
 | T3 | S2, S5, S8 | inline | done | L5, L10; commit 3bb8db4 |
-| T4 | S2, S6 | delegated (parallel with T1–T3: disjoint surface `lumni-bookings-spa/`) | done | L6, L11; SPA commit (feat(spa)) |
+| T4 | S2, S6 | delegated (parallel with T1–T3: disjoint surface `lumni-bookings-spa/`) | done | L6, L11; commit 4398f6a |
 | T5 | S4, S5 | inline | done except `.env.example` (left to the user) | L7, L10, L11 |
 
 - T1: contract (drop `Post`, reshape `User`, `role` enum), emit, plan migration, review, apply to local DB. Risk: item 1.
@@ -49,3 +49,4 @@ Branch: `main` (user convention: work-unit commits directly on main, no PR). Del
 - **L9** (2026-10-25) — User asked "Hashpassword no puede ser un simple bcrypt?", then "sí, pasalo a bcryptjs". `password-hasher.ts` now uses `bcryptjs` 3.0.3 (bundled types, installed with `--ignore-scripts`), cost 12, precomputed dummy hash for unknown emails. README D-19 updated in both languages. Seed must run after this change.
 - **L10** (2026-10-25) — User: "funciona". User regenerated `migrations/app/20261026T0221_init` and seeded. E2E probe (API on 3911 against `lumni-db`): wrong password and unknown email both `401 "Invalid email or password"`; customer login with ` Customer@Lumni.test ` → 200 + `lumni_session` (HttpOnly, SameSite=Lax, Max-Age=28800); `/me` 200; admin login 200; logout 204 then `/me` 401. Tailwind was already in the SPA scaffold (commit 7e06415); T4 only added `@theme` tokens. Independent verifier launched (items 1, 2, 5). Next: verifier verdict, then commits on main.
 - **L11** (2026-10-25) — Independent verifier: no blockers; S1–S5, S7–S9 met, S6 met by code reading. Fixed advisory 1: `safeRedirect` now rejects control characters, spaces and backslashes (probe: `/	/evil.com`, `/\evil.com`, `//evil.com`, `https://evil.com` → undefined; `/bookings?x=1` kept). Open advisories: cached `me` not refetched on cookie expiry; stateless logout (D-19); no minimum `JWT_SECRET` length; passwords >72 bytes truncated by bcrypt; Composer `service.ts` does not provide `JWT_SECRET`; `/auth/me` 5xx shows an error page. Commit `3bb8db4` (API + docs): RDD assess high (auth, migration), user chose "Omitir esta vez" → declined_this_candidate. `.env.example` excluded from commits: its diff cannot be read (deny rule), the user commits it.
+- **L12** (2026-10-25) — Commit `4398f6a` (SPA): RDD assess high (auth). User, verbatim: "Omitir toda revision" → declined_this_candidate, then `gentle-ai review mode disable` (global off). Feature closed; `.env.example` left uncommitted for the user.
