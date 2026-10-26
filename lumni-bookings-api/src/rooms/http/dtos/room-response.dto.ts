@@ -1,4 +1,5 @@
-export type RoomSize = "small" | "medium" | "large";
+import { formatAmount } from "../../../shared/http/money";
+import type { Room, RoomSize } from "../../domain/entities/room";
 
 // Whitelists the fields sent to clients.
 export class RoomResponseDto {
@@ -9,15 +10,15 @@ export class RoomResponseDto {
   readonly hourlyRate: string;
   readonly capacity: number;
 
-  private constructor(room: RoomResponseDto) {
+  private constructor(room: Room) {
     this.id = room.id;
     this.name = room.name;
     this.size = room.size;
-    this.hourlyRate = room.hourlyRate;
+    this.hourlyRate = formatAmount(room.hourlyRateCents);
     this.capacity = room.capacity;
   }
 
-  static from(room: RoomResponseDto): RoomResponseDto {
+  static from(room: Room): RoomResponseDto {
     return new RoomResponseDto(room);
   }
 }
