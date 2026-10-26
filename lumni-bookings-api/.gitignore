@@ -3,3 +3,6 @@ dist/
 .env
 /.alchemy
 /.prisma-composer
+
+# Contract ref of the local database, written by `pnpm migrate`
+/migrations/app/refs/db.json
