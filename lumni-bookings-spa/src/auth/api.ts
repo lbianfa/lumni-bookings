@@ -1,18 +1,20 @@
-import { ApiError, httpClient } from '../lib/http-client'
+import { ApiError, httpClient } from '../api/http-client'
 import type { Credentials, User } from './auth.types'
 
-export function login(credentials: Credentials): Promise<User> {
-  return httpClient.post<User>('/auth/login', credentials)
+export async function login(credentials: Credentials): Promise<User> {
+  const { data } = await httpClient.post<User>('/auth/login', credentials)
+  return data
 }
 
-export function logout(): Promise<void> {
-  return httpClient.post<void>('/auth/logout')
+export async function logout(): Promise<void> {
+  await httpClient.post('/auth/logout')
 }
 
 // A missing or expired session is a normal state, not an error.
 export async function fetchMe(): Promise<User | null> {
   try {
-    return await httpClient.get<User>('/auth/me')
+    const { data } = await httpClient.get<User>('/auth/me')
+    return data
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) return null
     throw error

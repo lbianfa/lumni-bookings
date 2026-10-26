@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { ApiError } from '../lib/http-client'
+import { ApiError } from '../api/http-client'
 import type { Credentials } from '../auth/auth.types'
 import { DemoAccounts } from '../auth/components/demo-accounts'
 import { LoginForm } from '../auth/components/login-form'
