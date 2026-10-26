@@ -1,5 +1,7 @@
 # quote-room
 
+Status: closed (2026-10-26).
+
 Objective: the "Quote a room" page (`design/Main.dc.html`) end to end: `POST /api/quotes` with the CONTEXT §1.1 rules, the rooms catalog, and the SPA screen. The 3-step booking flow is out of scope.
 Branch: `main` (user convention: work-unit commits directly on main, no PR). Delivery: commits per work unit. Test runner: none, by user decision (no tests in ODD features); checks are structural (`tsc`, build, lint) plus manual probes (curl, browser).
 
@@ -18,11 +20,11 @@ Branch: `main` (user convention: work-unit commits directly on main, no PR). Del
 
 | ID | Specs | Route | Status | Evidence |
 |----|-------|-------|--------|----------|
-| T1 | S2, S3, S8 | inline | done | L5, L7; commit f8b2fc6 |
-| T2 | S4, S5 | inline | done | L5, L7; commit 8f7b532 |
-| T3 | S6 | inline | done | L7; commit 8f7b532 |
-| T4 | S1, S4, S7 | inline | done (browser probe left to the user) | L6; commit 16f4e4a |
-| T5 | S3, S4 | inline | done | L7; this docs commit |
+| T1 | S2, S3, S8 | inline | done | L5, L7; commit f8b2fc6; reorganized in L8 |
+| T2 | S4, S5 | inline | done | L5, L7; commit 8f7b532; moved to `src/quotes` in f63c048 (L8) |
+| T3 | S6 | inline | done | L7; commit 8f7b532; `rooms` owns its repository in 15da50e (L8) |
+| T4 | S1, S4, S7 | inline | done; browser walk-through by the user | L6, L9; commits 16f4e4a, b72b63c, e687d70 |
+| T5 | S3, S4 | inline | done | L7, L8; commits ad02a48, 0a91fb8, 42995a3 |
 
 - T1: contract (`Room`, `Booking`, enums), seed with the 12 rooms; user emits and plans the migration, then the agent adds the exclusion constraint as `rawSql`. Risk: item 1.
 - T2: `bookings` feature: domain (quote calculator, opening hours, availability, next slot), `Clock` port, use case, Prisma adapters, `POST /api/quotes`, error filter.
@@ -43,3 +45,4 @@ Route evidence: no writer trigger holds (no parallel units launched together, no
 - **L7** (2026-10-26) — User applied the migration and the seed, and approved updating the SPA `CLAUDE.md`: page selections live in component state (also fixed its stale note on the `QueryClient`). E2E probe (API on 3911, local DB): `/api/rooms` and `/api/quotes` return 401 without a session; customer login 200; rooms 12, ordered by size. Temporary confirmed booking Room M1 2026-10-31 11:00–14:00: an overlapping confirmed insert fails with `Booking_room_slot_excl`, an overlapping draft is accepted (D-04); both probe rows deleted afterwards. Quotes: Saturday 09:00 4 h → 280,000 / −28,000 / +63,000 / 315,000, `room_booked` 11:00–14:00, suggestion 14:00–18:00; 14:00 2 h → available, 175,000; Friday 08:00 8 h → 20 %, 448,000; Sunday → `closed_day`; 2026-10-20 → `in_the_past`; 20:00 2 h → `outside_opening_hours`; 09:15 → 400; malformed body → 400 with field errors; unknown room → 404. Not done: browser walk-through of the page. RDD globally off: no native review. `migrations/app/refs/db.json` (local database ref written by the migrate run) left uncommitted for the user to decide. Commits: f8b2fc6 (data, Risk item 1), 8f7b532 (API), 16f4e4a (SPA), then this docs commit. Feature closed.
 - **L8** (2026-10-26) — Follow-up reorganization requested by the user, after the feature closed. The quote feature moved from `src/bookings` to `src/quotes` (`QuotesModule`; domain in `core/` and `exceptions.ts`). `src/bookings` now holds only the `BookingRepository` port and its Prisma adapter, exported by `BookingsModule`. `src/rooms` owns the `Room` entity, the `RoomRepository` port (`findById`, `list`), its Prisma adapter and the `ListRooms` use case; `RoomsModule` exports the repository. Repository files are named `<entity>.repo.ts` (ports) and `prisma-<entity>.repo.ts` (adapters). `migrations/app/refs/db.json` is git-ignored. No change to routes or responses. Checks: `tsc` exit 0 for each commit in an isolated export; API boot plus login, `/api/rooms` (401 without a session, same payload with one) and quotes (315,000 Saturday case, 180,000 for Room L2 1.5 h, 400 off-grid, 404 unknown room). Commits: 0a91fb8, 15da50e, f63c048, plus the docs commit.
 - **L9** (2026-10-26) — The user asked for the quote date input to use the Colombian order: day, month, year. The native `<input type="date">` always follows the browser locale, so the quote page now uses `DateField`: a text input fixed to `dd/mm/yyyy` (real calendar dates only, today or later, errors on blur) with a button that opens the browser calendar through `showPicker()` on a hidden native date input. The value passed to the page stays `YYYY-MM-DD`. A first attempt that changed the summary heading label instead was reverted at the user's request. Checks: SPA `tsc`, `eslint`, `build`, Prettier; browser walk-through by the user.
+- **L10** (2026-10-26) — The user closed the feature. All tasks are done; S1–S8 are covered: S1 (quote page only, no Start booking), S2 (minimal bookings table with the D-05 exclusion constraint), S3 (12 seeded rooms, D-22), S4 (D-21 past rule and remaining start times), S5 (`POST /api/quotes`), S6 (`GET /api/rooms`), S7 (SPA page per design, component state, dd/mm/yyyy date field), S8 (no tests; Prisma commands run by the user). Pending outside this feature: automated tests (user covers them later), the browser walk-through is the user's, and the hand-written exclusion constraint must survive future migration plans. Next feature: the 3-step booking flow, which extends `bookings`.
