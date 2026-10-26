@@ -14,23 +14,27 @@ import { SystemClock } from "../../shared/infrastructure/system-clock";
 import { BookingAccess } from "./application/helpers/booking-access";
 import { BookingDetailsReader } from "./application/helpers/booking-details";
 import { BookingQuoter } from "./application/helpers/booking-quoter";
+import { BookingSummaries } from "./application/helpers/booking-summaries";
 import { ConfirmBooking } from "./application/confirm-booking.use-case";
+import { GetAnyBooking } from "./application/get-any-booking.use-case";
 import { GetBooking } from "./application/get-booking.use-case";
+import { ListBookings } from "./application/list-bookings.use-case";
 import { ListMyBookings } from "./application/list-my-bookings.use-case";
 import { SaveCustomerDetails } from "./application/save-customer-details.use-case";
 import { SaveSchedule } from "./application/save-schedule.use-case";
 import { SaveServices } from "./application/save-services.use-case";
 import { StartBooking } from "./application/start-booking.use-case";
 import { BookingRepository } from "./domain/repos/booking.repo";
+import { AdminBookingsController } from "./http/admin-bookings.controller";
 import { BookingsController } from "./http/bookings.controller";
 import { MyBookingsController } from "./http/my-bookings.controller";
 import { PrismaBookingRepository } from "./infrastructure/prisma-booking.repo";
 
-// Owns the booking flow; the internal modules provide the repositories of its parts.
+// Owns the booking flow and the admin's booking reads; the internal modules provide the repositories of its parts.
 // Keeps exporting the booking repository for the quote's availability check.
 @Module({
   imports: [AuthModule, RoomsModule, CustomersModule, ServicesModule, BookingLinesModule, BookingServicesModule],
-  controllers: [BookingsController, MyBookingsController],
+  controllers: [BookingsController, MyBookingsController, AdminBookingsController],
   providers: [
     { provide: BookingRepository, useClass: PrismaBookingRepository },
     // Provided here, not imported: QuotesModule imports this module, so importing it back would be a module cycle.
@@ -40,9 +44,12 @@ import { PrismaBookingRepository } from "./infrastructure/prisma-booking.repo";
     BookingAccess,
     BookingQuoter,
     BookingDetailsReader,
+    BookingSummaries,
     StartBooking,
     GetBooking,
     ListMyBookings,
+    GetAnyBooking,
+    ListBookings,
     SaveCustomerDetails,
     SaveSchedule,
     SaveServices,

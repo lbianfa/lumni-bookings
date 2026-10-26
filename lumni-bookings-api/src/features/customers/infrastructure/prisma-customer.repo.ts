@@ -24,9 +24,16 @@ export class PrismaCustomerRepository extends CustomerRepository {
       .public.Customer.select("id", "email", "fullName", "company")
       .where({ id })
       .first();
-    return row
-      ? { id: String(row.id), email: row.email, fullName: row.fullName, company: row.company ?? null }
-      : null;
+    return row ? toCustomer(row) : null;
+  }
+
+  async findByIds(ids: readonly string[], tx?: Transaction): Promise<Customer[]> {
+    if (ids.length === 0) return [];
+    const rows = await ormOf(this.prisma, tx)
+      .public.Customer.select("id", "email", "fullName", "company")
+      .where((c) => c.id.in([...ids]))
+      .all();
+    return rows.map(toCustomer);
   }
 
   async update(customer: Customer, tx?: Transaction): Promise<void> {
@@ -39,4 +46,8 @@ export class PrismaCustomerRepository extends CustomerRepository {
       throw error;
     }
   }
+}
+
+function toCustomer(row: { id: unknown; email: string; fullName: string; company: string | null }): Customer {
+  return { id: String(row.id), email: row.email, fullName: row.fullName, company: row.company ?? null };
 }

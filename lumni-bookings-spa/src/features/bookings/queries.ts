@@ -32,6 +32,19 @@ export function bookingQueryOptions(bookingId: string) {
   })
 }
 
+// Any customer's booking, read by the admin. Its own key keeps it apart from the customer's cache.
+// No retries: a 404 must show the not-found state right away.
+export function adminBookingQueryOptions(bookingId: string) {
+  return queryOptions({
+    queryKey: ['admin', 'bookings', bookingId],
+    queryFn: async () => {
+      const { data } = await httpClient.get<Booking>(bookingPath(bookingId))
+      return data
+    },
+    retry: false,
+  })
+}
+
 // The session customer's bookings (My bookings). No retries: a 403 (a user without a
 // customer, such as the admin) must show its message right away.
 export const myBookingsQueryOptions = queryOptions({

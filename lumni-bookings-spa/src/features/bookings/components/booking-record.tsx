@@ -2,7 +2,6 @@ import type { ReactNode } from 'react'
 import { formatFullDateLabel } from '../../quotes/business-time'
 import { SIZE_LABELS, formatHours } from '../../quotes/format'
 import type { Booking } from '../booking.types'
-import { MyBookingsLink } from './my-bookings-link'
 import { PriceBreakdown } from './price-breakdown'
 import { StatusBadge } from './status-badge'
 
@@ -90,19 +89,26 @@ function HistoryEntry({
 }
 
 interface BookingRecordProps {
-  /** A booking that is no longer a draft: shown read-only. */
+  /** Shown read-only: a customer's booking that is no longer a draft, or any booking for the admin. */
   booking: Booking
+  /** The link back to the page the detail was opened from, if any. */
+  backLink?: ReactNode
   /** True right after this page confirmed it: shows the confirmation banner. */
-  justConfirmed: boolean
+  justConfirmed?: boolean
 }
 
-// The customer's booking detail, after the admin detail design without its admin-only parts (cancel, email box).
-export function BookingRecord({ booking, justConfirmed }: BookingRecordProps) {
+// The booking detail of the customer and the admin, after the admin detail design without the cancel action and
+// the email box.
+export function BookingRecord({
+  booking,
+  backLink,
+  justConfirmed = false,
+}: BookingRecordProps) {
   const services = booking.price.services
 
   return (
     <div className="flex max-w-[760px] flex-col gap-6">
-      <MyBookingsLink back />
+      {backLink}
       <div className="flex flex-wrap items-center gap-3.5">
         <h1 className="m-0 font-mono text-[30px] font-medium tracking-[-0.01em] [overflow-wrap:anywhere]">
           {booking.reference}

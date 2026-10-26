@@ -6,6 +6,7 @@ import { ApiError } from '../../../api/http-client'
 import { BackToQuoteLink } from '../../../features/bookings/components/back-to-quote-link'
 import { BookingRecord } from '../../../features/bookings/components/booking-record'
 import { BookingWizard } from '../../../features/bookings/components/booking-wizard'
+import { MyBookingsLink } from '../../../features/bookings/components/my-bookings-link'
 import { bookingErrorMessage } from '../../../features/bookings/errors'
 import { bookingQueryOptions } from '../../../features/bookings/queries'
 import { roomsQueryOptions } from '../../../features/rooms/queries'
@@ -47,6 +48,7 @@ function BookingPage() {
   ) : (
     <BookingRecord
       booking={booking}
+      backLink={<MyBookingsLink back />}
       justConfirmed={confirmedId === booking.id}
     />
   )

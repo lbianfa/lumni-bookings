@@ -3,6 +3,7 @@ import { JwtModule } from "@nestjs/jwt";
 
 import { AuthController } from "./http/auth.controller";
 import { SESSION_TTL_SECONDS } from "./http/session-cookie";
+import { AdminGuard } from "./http/admin.guard";
 import { SessionGuard } from "./http/session.guard";
 import { AuthService } from "./infrastructure/auth.service";
 
@@ -17,7 +18,7 @@ import { AuthService } from "./infrastructure/auth.service";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, SessionGuard],
-  exports: [AuthService, SessionGuard],
+  providers: [AuthService, SessionGuard, AdminGuard],
+  exports: [AuthService, SessionGuard, AdminGuard],
 })
 export class AuthModule {}

@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedBookingsIndexRouteImport } from './routes/_authenticated/bookings/index'
 import { Route as AuthenticatedBookingsBookingIdRouteImport } from './routes/_authenticated/bookings/$bookingId'
+import { Route as AuthenticatedAdminBookingsBookingIdRouteImport } from './routes/_authenticated/admin/bookings/$bookingId'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -29,6 +31,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedBookingsIndexRoute =
   AuthenticatedBookingsIndexRouteImport.update({
     id: '/bookings/',
@@ -41,39 +48,65 @@ const AuthenticatedBookingsBookingIdRoute =
     path: '/bookings/$bookingId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedAdminBookingsBookingIdRoute =
+  AuthenticatedAdminBookingsBookingIdRouteImport.update({
+    id: '/bookings/$bookingId',
+    path: '/bookings/$bookingId',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/bookings/$bookingId': typeof AuthenticatedBookingsBookingIdRoute
   '/bookings/': typeof AuthenticatedBookingsIndexRoute
+  '/admin/bookings/$bookingId': typeof AuthenticatedAdminBookingsBookingIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/': typeof AuthenticatedIndexRoute
   '/bookings/$bookingId': typeof AuthenticatedBookingsBookingIdRoute
   '/bookings': typeof AuthenticatedBookingsIndexRoute
+  '/admin/bookings/$bookingId': typeof AuthenticatedAdminBookingsBookingIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/bookings/$bookingId': typeof AuthenticatedBookingsBookingIdRoute
   '/_authenticated/bookings/': typeof AuthenticatedBookingsIndexRoute
+  '/_authenticated/admin/bookings/$bookingId': typeof AuthenticatedAdminBookingsBookingIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/bookings/$bookingId' | '/bookings/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/bookings/$bookingId'
+    | '/bookings/'
+    | '/admin/bookings/$bookingId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/' | '/bookings/$bookingId' | '/bookings'
+  to:
+    | '/login'
+    | '/admin'
+    | '/'
+    | '/bookings/$bookingId'
+    | '/bookings'
+    | '/admin/bookings/$bookingId'
   id:
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/admin'
     | '/_authenticated/'
     | '/_authenticated/bookings/$bookingId'
     | '/_authenticated/bookings/'
+    | '/_authenticated/admin/bookings/$bookingId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -104,6 +137,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/bookings/': {
       id: '/_authenticated/bookings/'
       path: '/bookings'
@@ -118,16 +158,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBookingsBookingIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/admin/bookings/$bookingId': {
+      id: '/_authenticated/admin/bookings/$bookingId'
+      path: '/bookings/$bookingId'
+      fullPath: '/admin/bookings/$bookingId'
+      preLoaderRoute: typeof AuthenticatedAdminBookingsBookingIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminBookingsBookingIdRoute: typeof AuthenticatedAdminBookingsBookingIdRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminBookingsBookingIdRoute:
+    AuthenticatedAdminBookingsBookingIdRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedBookingsBookingIdRoute: typeof AuthenticatedBookingsBookingIdRoute
   AuthenticatedBookingsIndexRoute: typeof AuthenticatedBookingsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedBookingsBookingIdRoute: AuthenticatedBookingsBookingIdRoute,
   AuthenticatedBookingsIndexRoute: AuthenticatedBookingsIndexRoute,

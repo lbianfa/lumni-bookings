@@ -5,11 +5,11 @@ import type { RoomSize } from "../../../rooms/domain/entities/room";
 import { roomSummarySchema } from "../../../rooms/http/dtos/room-response.dto";
 import { formatAmount } from "../../../../shared/http/money";
 import { amountSchema, timeOfDaySchema } from "../../../../shared/http/openapi";
-import type { BookingSummary } from "../../application/list-my-bookings.use-case";
+import type { BookingSummary } from "../../application/helpers/booking-summaries";
 import type { BookingStatus } from "../../domain/core/booking-status";
 import type { BookingStep } from "../../domain/entities/booking";
 
-const bookingListItemSchema = z.object({
+export const bookingListItemSchema = z.object({
   id: z.uuid(),
   reference: z.string().describe("BK-<id> (D-24)"),
   status: z.enum(["draft", "confirmed", "completed", "cancelled"]),

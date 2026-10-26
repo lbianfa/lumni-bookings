@@ -10,7 +10,7 @@ import { ormOf } from "../../../shared/infrastructure/prisma-unit-of-work";
 import type { BookingStatus } from "../domain/core/booking-status";
 import { Booking, type BookingStep, type NewBooking } from "../domain/entities/booking";
 import { SlotTakenError } from "../domain/exceptions";
-import { BookingRepository, type BookedInterval } from "../domain/repos/booking.repo";
+import { BookingRepository, type BookedInterval, type BookingFilter } from "../domain/repos/booking.repo";
 
 // Statuses that block a slot (D-04).
 const BLOCKING_STATUSES = ["confirmed", "completed"] as const;
@@ -99,6 +99,24 @@ export class PrismaBookingRepository extends BookingRepository {
     return rows.map(toBooking);
   }
 
+  async findPage(filter: BookingFilter, offset: number, limit: number, tx?: Transaction): Promise<Booking[]> {
+    const rows = await ormOf(this.prisma, tx)
+      .public.Booking.select(...BOOKING_FIELDS)
+      .where(whereOf(filter))
+      .orderBy([(b) => b.createdAt.desc(), (b) => b.id.desc()])
+      .limit(limit)
+      .offset(offset)
+      .all();
+    return rows.map(toBooking);
+  }
+
+  async count(filter: BookingFilter, tx?: Transaction): Promise<number> {
+    const { total } = await ormOf(this.prisma, tx)
+      .public.Booking.where(whereOf(filter))
+      .aggregate((aggregate) => ({ total: aggregate.count() }));
+    return total;
+  }
+
   async lockById(id: string, tx: Transaction): Promise<Booking | null> {
     // `FOR NO KEY UPDATE` serializes writers of the booking without blocking the foreign-key checks
     // of its lines and services (prisma-8, queries-postgres pitfall 13).
@@ -132,6 +150,11 @@ export class PrismaBookingRepository extends BookingRepository {
       throw error;
     }
   }
+}
+
+// Equality on the filter's present fields only; an empty filter matches every booking.
+function whereOf({ status, roomId }: BookingFilter) {
+  return { ...(status && { status }), ...(roomId && { roomId }) };
 }
 
 function toInstant(date: Date): Temporal.Instant {
