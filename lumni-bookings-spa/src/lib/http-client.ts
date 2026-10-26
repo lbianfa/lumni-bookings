@@ -1,3 +1,5 @@
+import axios, { isAxiosError } from 'axios'
+
 export class ApiError extends Error {
   readonly status: number
 
@@ -8,36 +10,18 @@ export class ApiError extends Error {
   }
 }
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+// Same-origin /api prefix: the browser sends the httpOnly session cookie on its own.
+const api = axios.create({ baseURL: '/api' })
 
-interface RequestOptions {
-  method?: HttpMethod
-  body?: unknown
-  signal?: AbortSignal
-}
-
-// Every call goes to the same-origin /api prefix; the session travels in an httpOnly cookie.
-export async function send<T>(
-  path: string,
-  { method = 'GET', body, signal }: RequestOptions = {},
-): Promise<T> {
-  const response = await fetch(`/api${path}`, {
-    method,
-    signal,
-    credentials: 'same-origin',
-    headers:
-      body === undefined ? undefined : { 'Content-Type': 'application/json' },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  })
-  if (!response.ok) {
-    throw new ApiError(response.status, await readErrorMessage(response))
+api.interceptors.response.use(undefined, (error: unknown) => {
+  if (isAxiosError(error) && error.response) {
+    const { status, data } = error.response
+    throw new ApiError(status, readErrorMessage(data, status))
   }
-  if (response.status === 204) return undefined as T
-  return (await response.json()) as T
-}
+  throw error
+})
 
-async function readErrorMessage(response: Response) {
-  const body: unknown = await response.json().catch(() => null)
+function readErrorMessage(body: unknown, status: number) {
   if (
     body &&
     typeof body === 'object' &&
@@ -46,7 +30,28 @@ async function readErrorMessage(response: Response) {
   ) {
     return body.message
   }
-  return `Request failed with status ${response.status}`
+  return `Request failed with status ${status}`
+}
+
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+
+interface RequestOptions {
+  method?: HttpMethod
+  body?: unknown
+  signal?: AbortSignal
+}
+
+export async function send<T>(
+  path: string,
+  { method = 'GET', body, signal }: RequestOptions = {},
+): Promise<T> {
+  const response = await api.request<T>({
+    url: path,
+    method,
+    data: body,
+    signal,
+  })
+  return response.status === 204 ? (undefined as T) : response.data
 }
 
 type Options = Omit<RequestOptions, 'method' | 'body'>
