@@ -2,21 +2,21 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { ApiError } from '../../api/http-client'
-import { bookingErrorMessage } from '../../bookings/errors'
-import { useStartBookingMutation } from '../../bookings/queries'
+import { bookingErrorMessage } from '../../features/bookings/errors'
+import { useStartBookingMutation } from '../../features/bookings/queries'
 import {
   businessNow,
   formatDateLabel,
   formatMinute,
   parseTime,
   startTimeOptions,
-} from '../../quotes/business-time'
-import { QuoteRequestPanel } from '../../quotes/components/quote-request-panel'
-import { QuoteSummary } from '../../quotes/components/quote-summary'
-import { SIZE_LABELS } from '../../quotes/format'
-import { quoteQueryOptions } from '../../quotes/queries'
-import type { QuoteRequest } from '../../quotes/quote.types'
-import { roomsQueryOptions } from '../../rooms/queries'
+} from '../../features/quotes/business-time'
+import { QuoteRequestPanel } from '../../features/quotes/components/quote-request-panel'
+import { QuoteSummary } from '../../features/quotes/components/quote-summary'
+import { SIZE_LABELS } from '../../features/quotes/format'
+import { quoteQueryOptions } from '../../features/quotes/queries'
+import type { QuoteRequest } from '../../features/quotes/quote.types'
+import { roomsQueryOptions } from '../../features/rooms/queries'
 
 const DEFAULT_DURATION_MINUTES = 4 * 60
 

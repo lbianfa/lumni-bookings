@@ -3,7 +3,7 @@ import {
   queryOptions,
   skipToken,
 } from '@tanstack/react-query'
-import { httpClient } from '../api/http-client'
+import { httpClient } from '../../api/http-client'
 import type { Quote, QuoteRequest } from './quote.types'
 
 async function fetchQuote(request: QuoteRequest): Promise<Quote> {

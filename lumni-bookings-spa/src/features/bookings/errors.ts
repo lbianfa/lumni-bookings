@@ -1,4 +1,4 @@
-import { ApiError } from '../api/http-client'
+import { ApiError } from '../../api/http-client'
 
 /**
  * The API's own message for client errors (a taken slot, an email in use, an expired quote),

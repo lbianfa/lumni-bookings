@@ -3,7 +3,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
-import { ApiError, httpClient } from '../api/http-client'
+import { ApiError, httpClient } from '../../api/http-client'
 import type { Booking, BookingCustomer, BookingSchedule } from './booking.types'
 
 function bookingPath(bookingId: string) {

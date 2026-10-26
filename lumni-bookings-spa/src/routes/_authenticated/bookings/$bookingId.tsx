@@ -2,12 +2,12 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import type { ErrorComponentProps } from '@tanstack/react-router'
 import { ApiError } from '../../../api/http-client'
-import { BackToQuoteLink } from '../../../bookings/components/back-to-quote-link'
-import { BookingRecord } from '../../../bookings/components/booking-record'
-import { BookingWizard } from '../../../bookings/components/booking-wizard'
-import { bookingErrorMessage } from '../../../bookings/errors'
-import { bookingQueryOptions } from '../../../bookings/queries'
-import { roomsQueryOptions } from '../../../rooms/queries'
+import { BackToQuoteLink } from '../../../features/bookings/components/back-to-quote-link'
+import { BookingRecord } from '../../../features/bookings/components/booking-record'
+import { BookingWizard } from '../../../features/bookings/components/booking-wizard'
+import { bookingErrorMessage } from '../../../features/bookings/errors'
+import { bookingQueryOptions } from '../../../features/bookings/queries'
+import { roomsQueryOptions } from '../../../features/rooms/queries'
 
 export const Route = createFileRoute('/_authenticated/bookings/$bookingId')({
   loader: async ({ context, params }) => {

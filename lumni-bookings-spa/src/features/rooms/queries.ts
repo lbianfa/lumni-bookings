@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import { httpClient } from '../api/http-client'
+import { httpClient } from '../../api/http-client'
 import type { Room } from './room.types'
 
 async function fetchRooms(): Promise<Room[]> {
