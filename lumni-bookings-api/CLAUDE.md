@@ -68,6 +68,7 @@ Clean Architecture is applied selectively. Use the full layers only where busine
 - Define ports as `abstract class` (no `I` prefix), e.g. `export abstract class BookingRepository`. TypeScript interfaces are erased at runtime and cannot be Nest injection tokens.
 - Always inject with an explicit token: `constructor(@Inject(BookingRepository) private readonly bookings: BookingRepository)`. `pnpm dev` runs through `tsx` (esbuild), which does not emit the decorator metadata Nest needs to inject by type alone; the scaffold injects with explicit tokens everywhere.
 - Bind adapters in the feature module: `{ provide: BookingRepository, useClass: PrismaBookingRepository }`.
+- `PrismaModule` (`src/prisma.module.ts`) is global and imported once in `AppModule`. Inject `PrismaService` directly in infrastructure classes; never add it to a feature module's `providers`, which would create a second instance.
 - Existing ports: `EmailSender` (D-10).
 
 ## TypeScript and modules
