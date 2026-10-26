@@ -29,6 +29,7 @@ function AuthenticatedLayout() {
       isSigningOut={logout.isPending}
       signOutFailed={logout.isError}
       onSignOut={signOut}
+      onDismissSignOutError={logout.reset}
     >
       <Outlet />
     </AppLayout>

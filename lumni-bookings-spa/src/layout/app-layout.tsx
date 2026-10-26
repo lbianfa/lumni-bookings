@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react'
 import type { User } from '../auth/auth.types'
+import { SignOutErrorDialog } from './components/sign-out-error-dialog'
 
 interface AppLayoutProps {
   user: User
   isSigningOut: boolean
   signOutFailed: boolean
   onSignOut: () => void
+  onDismissSignOutError: () => void
   children: ReactNode
 }
 
@@ -14,6 +16,7 @@ export function AppLayout({
   isSigningOut,
   signOutFailed,
   onSignOut,
+  onDismissSignOutError,
   children,
 }: AppLayoutProps) {
   return (
@@ -48,12 +51,12 @@ export function AppLayout({
 
       <main className="mx-auto max-w-[1200px] px-6 pt-10 pb-18">
         {children}
-        {signOutFailed && (
-          <p role="alert" className="mt-4 text-sm text-danger">
-            Could not sign out. Please try again.
-          </p>
-        )}
       </main>
+
+      <SignOutErrorDialog
+        open={signOutFailed}
+        onDismiss={onDismissSignOutError}
+      />
     </div>
   )
 }
