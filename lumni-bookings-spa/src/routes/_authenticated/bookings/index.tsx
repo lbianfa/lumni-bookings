@@ -1,7 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import type { ErrorComponentProps } from '@tanstack/react-router'
-import { ApiError } from '../../../api/http-client'
 import { BookingListItem } from '../../../features/bookings/components/booking-list-item'
 import { bookingErrorMessage } from '../../../features/bookings/errors'
 import { myBookingsQueryOptions } from '../../../features/bookings/queries'
@@ -56,10 +55,6 @@ function MyBookingsPage() {
 const LOAD_FAILED = 'Your bookings could not be loaded. Please try again.'
 
 function loadErrorMessage(error: unknown): string {
-  // A user without a customer profile (the admin) has no bookings of their own.
-  if (error instanceof ApiError && error.status === 403) {
-    return 'My bookings is only available to customer accounts.'
-  }
   return error instanceof Error
     ? bookingErrorMessage(error, LOAD_FAILED)
     : LOAD_FAILED

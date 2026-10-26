@@ -39,23 +39,25 @@ export function AppLayout({
             </span>
             Lumni
           </Link>
+          {/* Quoting and booking are for customers; the admin's links come with its bookings table. */}
           <nav aria-label="Main" className="flex flex-auto flex-wrap gap-1">
-            <Link
-              to="/quote"
-              activeOptions={{ exact: true, includeSearch: false }}
-              className={NAV_LINK_CLASS}
-            >
-              Quote
-            </Link>
-            {/* Only customers have bookings of their own. */}
             {user.role === 'customer' && (
-              <Link
-                to="/bookings"
-                activeOptions={{ exact: true, includeSearch: false }}
-                className={NAV_LINK_CLASS}
-              >
-                My bookings
-              </Link>
+              <>
+                <Link
+                  to="/quote"
+                  activeOptions={{ exact: true, includeSearch: false }}
+                  className={NAV_LINK_CLASS}
+                >
+                  Quote
+                </Link>
+                <Link
+                  to="/bookings"
+                  activeOptions={{ exact: true, includeSearch: false }}
+                  className={NAV_LINK_CLASS}
+                >
+                  My bookings
+                </Link>
+              </>
             )}
           </nav>
           <div className="flex items-center gap-2.5 text-sm text-ink-soft">
