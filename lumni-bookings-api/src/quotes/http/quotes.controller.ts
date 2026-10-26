@@ -3,13 +3,13 @@ import { Body, Controller, HttpCode, Inject, Post, UseFilters, UseGuards } from 
 import { SessionGuard } from "../../auth/http/session.guard";
 import { ZodValidationPipe } from "../../shared/http/zod-validation.pipe";
 import { QuoteRoom } from "../application/quote-room.use-case";
-import { BookingsExceptionFilter } from "./bookings-exception.filter";
+import { QuotesExceptionFilter } from "./quotes-exception.filter";
 import { QuoteRequestDto } from "./dtos/quote-request.dto";
 import { QuoteResponseDto } from "./dtos/quote-response.dto";
 
 @Controller("quotes")
 @UseGuards(SessionGuard)
-@UseFilters(BookingsExceptionFilter)
+@UseFilters(QuotesExceptionFilter)
 export class QuotesController {
   constructor(@Inject(QuoteRoom) private readonly quoteRoom: QuoteRoom) {}
 

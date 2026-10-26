@@ -1,12 +1,10 @@
-import { DomainError } from "../../shared/domain/domain-error";
 import { toInstant } from "./business-time";
+import { InvalidTimeSlotError } from "../exceptions";
 
 // Booking grid and duration limits (CONTEXT §1.1).
 export const SLOT_MINUTES = 30;
 export const MIN_DURATION_MINUTES = 60;
 export const MAX_DURATION_MINUTES = 600;
-
-export class InvalidTimeSlotError extends DomainError {}
 
 /** A requested booking interval on one business date, half-open: [start, end). */
 export class TimeSlot {

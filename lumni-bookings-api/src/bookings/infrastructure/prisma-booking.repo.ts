@@ -3,7 +3,7 @@ import { Inject, Injectable } from "@nestjs/common";
 import { Temporal } from "temporal-polyfill";
 
 import { PrismaService } from "../../prisma.service";
-import { BookingRepository, type BookedInterval } from "../domain/booking-repository";
+import { BookingRepository, type BookedInterval } from "../domain/repos/booking.repo";
 
 // Statuses that block a slot (D-04).
 const BLOCKING_STATUSES = ["confirmed", "completed"] as const;

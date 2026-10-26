@@ -2,12 +2,11 @@ import { Catch, HttpStatus, type ArgumentsHost, type ExceptionFilter } from "@ne
 import type { Response } from "express";
 
 import { DomainError } from "../../shared/domain/domain-error";
-import { RoomNotFoundError } from "../domain/room";
-import { InvalidTimeSlotError } from "../domain/time-slot";
+import { InvalidTimeSlotError, RoomNotFoundError } from "../domain/exceptions";
 
-// Maps the bookings domain errors to HTTP status codes; the domain never throws HttpException.
+// Maps the quotes domain errors to HTTP status codes; the domain never throws HttpException.
 @Catch(DomainError)
-export class BookingsExceptionFilter implements ExceptionFilter<DomainError> {
+export class QuotesExceptionFilter implements ExceptionFilter<DomainError> {
   catch(error: DomainError, host: ArgumentsHost): void {
     const response = host.switchToHttp().getResponse<Response>();
     if (error instanceof RoomNotFoundError) {

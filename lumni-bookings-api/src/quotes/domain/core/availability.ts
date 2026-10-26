@@ -1,5 +1,5 @@
 import { SUNDAY, dayOfWeek, minutesSinceStartOf } from "./business-time";
-import type { BookedInterval } from "./booking-repository";
+import type { BookedInterval } from "../../../bookings/domain/repos/booking.repo";
 import { SLOT_MINUTES, type TimeSlot } from "./time-slot";
 
 // Opening hours, Monday to Saturday (CONTEXT §1.1): the whole booking fits inside them.

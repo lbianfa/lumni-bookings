@@ -1,12 +1,14 @@
 import { Inject, Injectable } from "@nestjs/common";
 
 import { Clock } from "../../shared/domain/clock";
-import { checkAvailability, type Availability } from "../domain/availability";
-import { BookingRepository } from "../domain/booking-repository";
-import { SATURDAY, dayOfWeek, toInstant } from "../domain/business-time";
-import { calculatePrice, type Price } from "../domain/price";
-import { RoomNotFoundError, RoomRepository, type Room } from "../domain/room";
-import { TimeSlot } from "../domain/time-slot";
+import { checkAvailability, type Availability } from "../domain/core/availability";
+import { BookingRepository } from "../../bookings/domain/repos/booking.repo";
+import { SATURDAY, dayOfWeek, toInstant } from "../domain/core/business-time";
+import { calculatePrice, type Price } from "../domain/core/price";
+import type { Room } from "../../rooms/domain/entities/room";
+import { RoomNotFoundError } from "../domain/exceptions";
+import { RoomRepository } from "../../rooms/domain/repos/room.repo";
+import { TimeSlot } from "../domain/core/time-slot";
 
 export interface QuoteRoomInput {
   readonly roomId: string;

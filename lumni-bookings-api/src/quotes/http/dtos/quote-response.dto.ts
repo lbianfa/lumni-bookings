@@ -1,12 +1,8 @@
 import type { Quote } from "../../application/quote-room.use-case";
-import { CLOSING_MINUTE, OPENING_MINUTE, type Unavailability } from "../../domain/availability";
-import { formatMinute } from "../../domain/business-time";
-import type { RoomSize } from "../../domain/room";
-
-/** COP amount as a decimal string with two places, matching the `numeric(14,2)` storage (D-13). */
-function formatAmount(cents: number): string {
-  return (cents / 100).toFixed(2);
-}
+import { CLOSING_MINUTE, OPENING_MINUTE, type Unavailability } from "../../domain/core/availability";
+import { formatMinute } from "../../domain/core/business-time";
+import type { RoomSize } from "../../../rooms/domain/entities/room";
+import { formatAmount } from "../../../shared/http/money";
 
 function describe(reason: Unavailability, quote: Quote): string {
   switch (reason.code) {
