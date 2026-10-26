@@ -1,6 +1,6 @@
 import { Controller, Get, Inject } from "@nestjs/common";
 
-import { UsersService } from "./users.service";
+import { UsersService } from "../infrastructure/users.service";
 
 @Controller("users")
 export class UsersController {
