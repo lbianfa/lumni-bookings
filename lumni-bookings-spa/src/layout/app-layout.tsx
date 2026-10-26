@@ -1,0 +1,59 @@
+import type { ReactNode } from 'react'
+import type { User } from '../auth/auth.types'
+
+interface AppLayoutProps {
+  user: User
+  isSigningOut: boolean
+  signOutFailed: boolean
+  onSignOut: () => void
+  children: ReactNode
+}
+
+export function AppLayout({
+  user,
+  isSigningOut,
+  signOutFailed,
+  onSignOut,
+  children,
+}: AppLayoutProps) {
+  return (
+    <div className="min-h-screen bg-canvas text-ink">
+      <header className="border-b border-line bg-white">
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-8 gap-y-2 px-6 py-2">
+          <span className="inline-flex min-h-11 items-center gap-2.5 text-lg font-bold">
+            <span
+              aria-hidden="true"
+              className="inline-flex size-7 items-center justify-center rounded-lg bg-brand text-[15px] text-white"
+            >
+              L
+            </span>
+            Lumni
+          </span>
+          <div className="ml-auto flex items-center gap-2.5 text-sm text-ink-soft">
+            <span>{user.email}</span>
+            <span className="rounded-full bg-brand-tint px-2.5 py-0.5 text-xs font-semibold text-brand-strong capitalize">
+              {user.role}
+            </span>
+            <button
+              type="button"
+              onClick={onSignOut}
+              disabled={isSigningOut}
+              className="inline-flex min-h-11 items-center px-2 text-sm font-medium text-brand-strong hover:text-brand-deep disabled:opacity-60"
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-[1200px] px-6 pt-10 pb-18">
+        {children}
+        {signOutFailed && (
+          <p role="alert" className="mt-4 text-sm text-danger">
+            Could not sign out. Please try again.
+          </p>
+        )}
+      </main>
+    </div>
+  )
+}
