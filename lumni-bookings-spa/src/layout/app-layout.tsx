@@ -3,6 +3,9 @@ import type { ReactNode } from 'react'
 import type { User } from '../auth/auth.types'
 import { SignOutErrorDialog } from './components/sign-out-error-dialog'
 
+const NAV_LINK_CLASS =
+  'inline-flex min-h-11 items-center rounded-[10px] px-3.5 text-sm font-medium text-ink-soft no-underline aria-[current=page]:bg-brand-tint aria-[current=page]:font-semibold aria-[current=page]:text-brand-strong'
+
 interface AppLayoutProps {
   user: User
   isSigningOut: boolean
@@ -40,10 +43,20 @@ export function AppLayout({
             <Link
               to="/"
               activeOptions={{ exact: true, includeSearch: false }}
-              className="inline-flex min-h-11 items-center rounded-[10px] px-3.5 text-sm font-medium text-ink-soft no-underline aria-[current=page]:bg-brand-tint aria-[current=page]:font-semibold aria-[current=page]:text-brand-strong"
+              className={NAV_LINK_CLASS}
             >
               Quote
             </Link>
+            {/* Only customers have bookings of their own. */}
+            {user.role === 'customer' && (
+              <Link
+                to="/bookings"
+                activeOptions={{ exact: true, includeSearch: false }}
+                className={NAV_LINK_CLASS}
+              >
+                My bookings
+              </Link>
+            )}
           </nav>
           <div className="flex items-center gap-2.5 text-sm text-ink-soft">
             <span>{user.email}</span>

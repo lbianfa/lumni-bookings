@@ -54,3 +54,26 @@ export interface Booking {
   quotedAt: string
   confirmedAt: string | null
 }
+
+/** One row of `GET /api/bookings`: the session customer's bookings, newest first. */
+export interface BookingListItem {
+  id: string
+  /** `BK-<id>`. */
+  reference: string
+  status: BookingStatus
+  /** The furthest step reached, where a reopened draft resumes. */
+  currentStep: BookingStep
+  room: { id: string; name: string; size: RoomSize }
+  /** Business date, `YYYY-MM-DD`. */
+  date: string
+  /** `HH:mm`. */
+  startTime: string
+  /** `HH:mm`. */
+  endTime: string
+  /** COP, decimal string with two places. */
+  total: string
+  /** The selected services, in catalog order. */
+  services: { code: string; name: string }[]
+  cancellationReason: string | null
+  createdAt: string
+}

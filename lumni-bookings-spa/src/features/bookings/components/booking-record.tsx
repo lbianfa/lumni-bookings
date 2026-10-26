@@ -3,6 +3,7 @@ import type { Booking } from '../booking.types'
 import { BackToQuoteLink } from './back-to-quote-link'
 import { BookingHeader } from './booking-header'
 import { BookingSummary } from './booking-summary'
+import { MyBookingsLink } from './my-bookings-link'
 
 /** `Oct 26, 2026, 3:42 PM`, in business time (README D-02). */
 function formatTimestamp(timestamp: string): string {
@@ -21,7 +22,10 @@ interface BookingRecordProps {
 export function BookingRecord({ booking }: BookingRecordProps) {
   return (
     <div className="flex flex-col gap-6">
-      <BackToQuoteLink />
+      <div className="flex flex-wrap gap-x-6">
+        <BackToQuoteLink />
+        <MyBookingsLink />
+      </div>
       <BookingHeader
         status={booking.status}
         reference={booking.reference}

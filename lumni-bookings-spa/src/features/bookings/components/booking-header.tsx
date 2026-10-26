@@ -1,11 +1,5 @@
 import type { BookingStatus } from '../booking.types'
-
-const STATUS_STYLES: Record<BookingStatus, string> = {
-  draft: 'bg-neutral-tint text-ink-soft',
-  confirmed: 'bg-brand-tint text-brand-strong',
-  completed: 'bg-info-tint text-info',
-  cancelled: 'bg-danger-tint text-danger',
-}
+import { StatusBadge } from './status-badge'
 
 interface BookingHeaderProps {
   status: BookingStatus
@@ -25,11 +19,7 @@ export function BookingHeader({
     <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2.5">
-          <span
-            className={`inline-flex min-h-[26px] items-center rounded-full px-2.5 text-xs font-bold tracking-[0.04em] uppercase ${STATUS_STYLES[status]}`}
-          >
-            {status}
-          </span>
+          <StatusBadge status={status} variant="heading" />
           <span className="font-mono text-[13px] text-muted">{reference}</span>
         </div>
         <h1 className="m-0 text-[32px] leading-tight font-bold tracking-[-0.02em]">

@@ -3,8 +3,14 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
+import type { QueryClient } from '@tanstack/react-query'
 import { ApiError, httpClient } from '../../api/http-client'
-import type { Booking, BookingCustomer, BookingSchedule } from './booking.types'
+import type {
+  Booking,
+  BookingCustomer,
+  BookingListItem,
+  BookingSchedule,
+} from './booking.types'
 
 function bookingPath(bookingId: string) {
   return `/bookings/${encodeURIComponent(bookingId)}`
@@ -24,6 +30,25 @@ export function bookingQueryOptions(bookingId: string) {
   })
 }
 
+// The session customer's bookings (My bookings). No retries: a 403 (a user without a
+// customer, such as the admin) must show its message right away.
+export const myBookingsQueryOptions = queryOptions({
+  queryKey: ['bookings'],
+  queryFn: async () => {
+    const { data } = await httpClient.get<BookingListItem[]>('/bookings')
+    return data
+  },
+  retry: false,
+})
+
+// Exact: the detail keys (`['bookings', id]`) share the prefix and are updated from the response.
+function invalidateMyBookings(queryClient: QueryClient) {
+  return queryClient.invalidateQueries({
+    queryKey: myBookingsQueryOptions.queryKey,
+    exact: true,
+  })
+}
+
 export function useStartBookingMutation() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -36,6 +61,7 @@ export function useStartBookingMutation() {
         bookingQueryOptions(booking.id).queryKey,
         booking,
       )
+      void invalidateMyBookings(queryClient)
     },
   })
 }
@@ -52,6 +78,7 @@ function useBookingUpdate<TBody>(
     mutationFn: (body: TBody) => send(bookingPath(bookingId), body),
     onSuccess: (booking) => {
       queryClient.setQueryData(queryKey, booking)
+      void invalidateMyBookings(queryClient)
     },
     onError: (error) => {
       if (error instanceof ApiError && error.status === 409) {

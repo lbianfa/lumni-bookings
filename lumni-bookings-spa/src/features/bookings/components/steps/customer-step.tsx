@@ -1,4 +1,5 @@
 import { useForm } from '@tanstack/react-form'
+import { Link } from '@tanstack/react-router'
 import { formatDateLabel } from '../../../quotes/business-time'
 import { SIZE_LABELS, formatCop } from '../../../quotes/format'
 import type { Booking } from '../../booking.types'
@@ -181,7 +182,14 @@ export function CustomerStep({ booking, onSaved }: CustomerStepProps) {
         </div>
         <p className="m-0 rounded-xl bg-neutral-tint p-4 text-[13px] leading-normal text-ink-soft">
           Each step is saved as a draft. You can close this page and pick up
-          where you left off by opening it again.
+          where you left off from{' '}
+          <Link
+            to="/bookings"
+            className="font-semibold text-brand-strong hover:text-brand-deep"
+          >
+            My bookings
+          </Link>
+          .
         </p>
       </aside>
     </div>
