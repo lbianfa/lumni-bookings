@@ -2,11 +2,12 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import type { ErrorComponentProps } from '@tanstack/react-router'
 import { ApiError } from '../../../../api/http-client'
+import { AllBookingsLink } from '../../../../features/bookings/components/admin/all-bookings-link'
 import { BookingRecord } from '../../../../features/bookings/components/booking-record'
 import { bookingErrorMessage } from '../../../../features/bookings/errors'
 import { adminBookingQueryOptions } from '../../../../features/bookings/queries'
 
-// Any customer's booking, read-only. Reached by its URL until the admin's bookings table exists.
+// Any customer's booking, read-only, opened from the admin's bookings table.
 export const Route = createFileRoute(
   '/_authenticated/admin/bookings/$bookingId',
 )({
@@ -30,7 +31,7 @@ function AdminBookingPage() {
   const { data: booking } = useSuspenseQuery(
     adminBookingQueryOptions(bookingId),
   )
-  return <BookingRecord booking={booking} />
+  return <BookingRecord booking={booking} backLink={<AllBookingsLink />} />
 }
 
 const LOAD_FAILED = 'The booking could not be loaded. Please try again.'
@@ -38,6 +39,7 @@ const LOAD_FAILED = 'The booking could not be loaded. Please try again.'
 function AdminBookingNotFound() {
   return (
     <div className="flex flex-col gap-4">
+      <AllBookingsLink />
       <h1 className="m-0 text-[32px] leading-tight font-bold tracking-[-0.02em]">
         Booking not found
       </h1>
@@ -50,13 +52,16 @@ function AdminBookingNotFound() {
 
 function AdminBookingError({ error }: ErrorComponentProps) {
   return (
-    <p
-      role="alert"
-      className="m-0 max-w-[640px] rounded-xl bg-danger-tint px-4 py-3.5 text-sm text-danger"
-    >
-      {error instanceof Error
-        ? bookingErrorMessage(error, LOAD_FAILED)
-        : LOAD_FAILED}
-    </p>
+    <div className="flex flex-col gap-4">
+      <AllBookingsLink />
+      <p
+        role="alert"
+        className="m-0 max-w-[640px] rounded-xl bg-danger-tint px-4 py-3.5 text-sm text-danger"
+      >
+        {error instanceof Error
+          ? bookingErrorMessage(error, LOAD_FAILED)
+          : LOAD_FAILED}
+      </p>
+    </div>
   )
 }

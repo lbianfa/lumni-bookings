@@ -17,6 +17,7 @@ import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedQuoteRouteImport } from './routes/_authenticated/quote'
 import { Route as AuthenticatedBookingsIndexRouteImport } from './routes/_authenticated/bookings/index'
 import { Route as AuthenticatedBookingsBookingIdRouteImport } from './routes/_authenticated/bookings/$bookingId'
+import { Route as AuthenticatedAdminBookingsIndexRouteImport } from './routes/_authenticated/admin/bookings/index'
 import { Route as AuthenticatedAdminBookingsBookingIdRouteImport } from './routes/_authenticated/admin/bookings/$bookingId'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -60,6 +61,12 @@ const AuthenticatedBookingsBookingIdRoute =
     path: '/$bookingId',
     getParentRoute: () => AuthenticatedBookingsRoute,
   } as any)
+const AuthenticatedAdminBookingsIndexRoute =
+  AuthenticatedAdminBookingsIndexRouteImport.update({
+    id: '/bookings/',
+    path: '/bookings/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminBookingsBookingIdRoute =
   AuthenticatedAdminBookingsBookingIdRouteImport.update({
     id: '/bookings/$bookingId',
@@ -76,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/bookings/$bookingId': typeof AuthenticatedBookingsBookingIdRoute
   '/bookings/': typeof AuthenticatedBookingsIndexRoute
   '/admin/bookings/$bookingId': typeof AuthenticatedAdminBookingsBookingIdRoute
+  '/admin/bookings/': typeof AuthenticatedAdminBookingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -85,6 +93,7 @@ export interface FileRoutesByTo {
   '/bookings/$bookingId': typeof AuthenticatedBookingsBookingIdRoute
   '/bookings': typeof AuthenticatedBookingsIndexRoute
   '/admin/bookings/$bookingId': typeof AuthenticatedAdminBookingsBookingIdRoute
+  '/admin/bookings': typeof AuthenticatedAdminBookingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -97,6 +106,7 @@ export interface FileRoutesById {
   '/_authenticated/bookings/$bookingId': typeof AuthenticatedBookingsBookingIdRoute
   '/_authenticated/bookings/': typeof AuthenticatedBookingsIndexRoute
   '/_authenticated/admin/bookings/$bookingId': typeof AuthenticatedAdminBookingsBookingIdRoute
+  '/_authenticated/admin/bookings/': typeof AuthenticatedAdminBookingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/bookings/$bookingId'
     | '/bookings/'
     | '/admin/bookings/$bookingId'
+    | '/admin/bookings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/bookings/$bookingId'
     | '/bookings'
     | '/admin/bookings/$bookingId'
+    | '/admin/bookings'
   id:
     | '__root__'
     | '/_authenticated'
@@ -129,6 +141,7 @@ export interface FileRouteTypes {
     | '/_authenticated/bookings/$bookingId'
     | '/_authenticated/bookings/'
     | '/_authenticated/admin/bookings/$bookingId'
+    | '/_authenticated/admin/bookings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBookingsBookingIdRouteImport
       parentRoute: typeof AuthenticatedBookingsRoute
     }
+    '/_authenticated/admin/bookings/': {
+      id: '/_authenticated/admin/bookings/'
+      path: '/bookings'
+      fullPath: '/admin/bookings/'
+      preLoaderRoute: typeof AuthenticatedAdminBookingsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/bookings/$bookingId': {
       id: '/_authenticated/admin/bookings/$bookingId'
       path: '/bookings/$bookingId'
@@ -206,11 +226,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminBookingsBookingIdRoute: typeof AuthenticatedAdminBookingsBookingIdRoute
+  AuthenticatedAdminBookingsIndexRoute: typeof AuthenticatedAdminBookingsIndexRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminBookingsBookingIdRoute:
     AuthenticatedAdminBookingsBookingIdRoute,
+  AuthenticatedAdminBookingsIndexRoute: AuthenticatedAdminBookingsIndexRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =

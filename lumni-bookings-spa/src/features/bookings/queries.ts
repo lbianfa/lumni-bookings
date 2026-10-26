@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   queryOptions,
   useMutation,
   useQueryClient,
@@ -8,7 +9,9 @@ import { ApiError, httpClient } from '../../api/http-client'
 import type {
   Booking,
   BookingCustomer,
+  BookingFilters,
   BookingListItem,
+  BookingPage,
   BookingSchedule,
 } from './booking.types'
 
@@ -42,6 +45,24 @@ export function adminBookingQueryOptions(bookingId: string) {
       return data
     },
     retry: false,
+  })
+}
+
+// One page of every customer's bookings, for the admin's table. The previous page stays on screen
+// while the next one loads, so the table does not flash empty between pages or filters.
+export function adminBookingsQueryOptions(
+  filters: BookingFilters,
+  page: number,
+) {
+  return queryOptions({
+    queryKey: ['admin', 'bookings', 'list', filters, page],
+    queryFn: async () => {
+      const { data } = await httpClient.get<BookingPage>('/bookings', {
+        params: { ...filters, page },
+      })
+      return data
+    },
+    placeholderData: keepPreviousData,
   })
 }
 

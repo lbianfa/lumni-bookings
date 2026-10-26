@@ -40,19 +40,37 @@ function HomePage() {
         >
           Welcome back, {user.email}
         </h1>
-        {user.role === 'customer' && (
-          <p className="m-0 max-w-[640px] text-[17px] leading-normal text-muted">
-            What would you like to do today?
-          </p>
-        )}
+        <p className="m-0 max-w-[640px] text-[17px] leading-normal text-muted">
+          What would you like to do today?
+        </p>
       </section>
 
-      {user.role === 'customer' && <CustomerActions />}
+      {user.role === 'customer' ? <CustomerActions /> : <AdminActions />}
     </div>
   )
 }
 
-// The admin's actions come with its bookings table; the assistant's card comes with the assistant.
+const LIST_ICON = (
+  <svg
+    width="28"
+    height="28"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.75"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M8 6h13" />
+    <path d="M8 12h13" />
+    <path d="M8 18h13" />
+    <path d="M3 6h.01" />
+    <path d="M3 12h.01" />
+    <path d="M3 18h.01" />
+  </svg>
+)
+
+// The assistant's card comes with the assistant.
 function CustomerActions() {
   const { data: bookings } = useQuery(myBookingsQueryOptions)
   // Newest created first, so the first draft is the latest one.
@@ -91,29 +109,28 @@ function CustomerActions() {
           to="/bookings"
           title="My bookings"
           description="Resume a draft or check the details of a confirmed booking."
-          icon={
-            <svg
-              width="28"
-              height="28"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M8 6h13" />
-              <path d="M8 12h13" />
-              <path d="M8 18h13" />
-              <path d="M3 6h.01" />
-              <path d="M3 12h.01" />
-              <path d="M3 18h.01" />
-            </svg>
-          }
+          icon={LIST_ICON}
         />
       </section>
 
       {draft && <ResumeDraftCard draft={draft} />}
     </>
+  )
+}
+
+function AdminActions() {
+  return (
+    <section
+      aria-label="Quick actions"
+      className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-5"
+    >
+      <QuickActionCard
+        to="/admin/bookings"
+        primary
+        title="Bookings"
+        description="Filter every customer's bookings by status and room, and open their details."
+        icon={LIST_ICON}
+      />
+    </section>
   )
 }

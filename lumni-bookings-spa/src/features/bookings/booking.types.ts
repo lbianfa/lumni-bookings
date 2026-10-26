@@ -79,3 +79,26 @@ export interface BookingListItem {
   cancellationReason: string | null
   createdAt: string
 }
+
+/** One row of `GET /api/bookings` (the admin's list): a My bookings item plus whose booking it is. */
+export interface AdminBookingListItem extends BookingListItem {
+  customer: { id: string; fullName: string }
+}
+
+/** One page of `GET /api/bookings`, newest created first. */
+export interface BookingPage {
+  items: AdminBookingListItem[]
+  /** From 1. */
+  page: number
+  pageSize: number
+  /** Bookings matching the filters, on every page. */
+  total: number
+  /** At least 1. */
+  totalPages: number
+}
+
+/** The admin list's filters; an absent field does not filter. */
+export interface BookingFilters {
+  status?: BookingStatus
+  roomId?: string
+}
