@@ -42,7 +42,7 @@ module.ts, service.ts        # Prisma Composer app definition (scaffold, root le
 migrations/                  # Prisma 8 migrations (generated, then reviewed)
 ```
 
-File names are kebab-case (`create-booking.use-case.ts`, `booking.entity.ts`). `auth` is a thin feature (`http` + `infrastructure`): login, logout, and the current user (D-19, D-20).
+File names are kebab-case (`create-booking.use-case.ts`, `booking.entity.ts`). `auth` is a thin feature (`http` + `infrastructure`): login, logout, and the current user (D-19, D-20). `rooms` is thin too (`GET /api/rooms`). `bookings` has full layers; so far it holds the quote (`POST /api/quotes`).
 
 ## Where to apply the layers
 
@@ -69,7 +69,7 @@ Clean Architecture is applied selectively. Use the full layers only where busine
 - Always inject with an explicit token: `constructor(@Inject(BookingRepository) private readonly bookings: BookingRepository)`. `pnpm dev` runs through `tsx` (esbuild), which does not emit the decorator metadata Nest needs to inject by type alone; the scaffold injects with explicit tokens everywhere.
 - Bind adapters in the feature module: `{ provide: BookingRepository, useClass: PrismaBookingRepository }`.
 - `PrismaModule` (`src/prisma.module.ts`) is global and imported once in `AppModule`. Inject `PrismaService` directly in infrastructure classes; never add it to a feature module's `providers`, which would create a second instance.
-- Existing ports: `EmailSender` (D-10).
+- Existing ports: `Clock` (`src/shared/domain`, bound to `SystemClock`); `RoomRepository` and `BookingRepository` (`src/bookings/domain`, Prisma adapters). Planned: `EmailSender` (D-10).
 
 ## TypeScript and modules
 
@@ -96,6 +96,6 @@ Clean Architecture is applied selectively. Use the full layers only where busine
 - `pnpm dev`: run with `tsx watch` against `DATABASE_URL` (see `.env.example`).
 - `pnpm dev:composer`: build and run with Composer, which provides a local Prisma Postgres and applies the committed migrations.
 - `pnpm build`: bundle with `tsdown` into `dist/`.
-- `pnpm db:seed`: create or reset the two demo users (D-20).
+- `pnpm db:seed`: create or reset the two demo users (D-20) and the twelve rooms (D-22).
 - `pnpm contract:emit`, `pnpm migration:plan`, `pnpm migrate`, `pnpm migration:status`: Prisma 8 contract and migration workflow.
 - `pnpm deploy`: deploys to Prisma Compute. Never run it without explicit approval.
