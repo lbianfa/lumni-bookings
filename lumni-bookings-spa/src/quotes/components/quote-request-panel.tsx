@@ -1,6 +1,7 @@
 import type { Room, RoomSize } from '../../rooms/room.types'
 import { MAX_DURATION_MINUTES, MIN_DURATION_MINUTES } from '../business-time'
 import { SIZE_LABELS, formatCop, formatHours } from '../format'
+import { DateField } from './date-field'
 
 const SIZES: RoomSize[] = ['small', 'medium', 'large']
 
@@ -92,20 +93,14 @@ export function QuoteRequestPanel({
       </div>
 
       <div className="flex flex-wrap gap-4">
-        <div className="flex flex-[1_1_200px] flex-col gap-2">
-          <label htmlFor="quote-date" className="text-sm font-semibold">
-            Date
-          </label>
-          <input
+        <div className="flex-[1_1_200px]">
+          <DateField
             id="quote-date"
-            type="date"
-            required
-            min={minDate}
+            label="Date"
             value={date}
-            onChange={(event) => {
-              if (event.target.value) onDateChange(event.target.value)
-            }}
+            min={minDate}
             className={fieldClass}
+            onChange={onDateChange}
           />
         </div>
         <div className="flex flex-[1_1_160px] flex-col gap-2">
