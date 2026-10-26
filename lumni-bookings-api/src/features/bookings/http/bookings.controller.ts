@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Inject, Param, Post, Put, Req, UseFilters, UseGuards } from "@nestjs/common";
+import { Body, Controller, HttpCode, Inject, Param, Post, Put, Req, UseFilters, UseGuards } from "@nestjs/common";
 import { ApiCookieAuth, ApiCreatedResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags } from "@nestjs/swagger";
 
 import { SessionGuard, type AuthenticatedRequest } from "../../../auth/http/session.guard";
@@ -6,8 +6,6 @@ import { QuoteRequestDto } from "../../quotes/http/dtos/quote-request.dto";
 import { ApiError, ApiJsonBody, badRequestBodySchema } from "../../../shared/http/openapi";
 import { ZodValidationPipe } from "../../../shared/http/zod-validation.pipe";
 import { ConfirmBooking } from "../application/confirm-booking.use-case";
-import { GetBooking } from "../application/get-booking.use-case";
-import { ListMyBookings } from "../application/list-my-bookings.use-case";
 import { SaveCustomerDetails } from "../application/save-customer-details.use-case";
 import { SaveSchedule } from "../application/save-schedule.use-case";
 import { SaveServices } from "../application/save-services.use-case";
@@ -15,12 +13,11 @@ import { StartBooking } from "../application/start-booking.use-case";
 import { BookingIdPipe } from "./booking-id.pipe";
 import { BookingsExceptionFilter } from "./bookings-exception.filter";
 import { bookingConflictSchema } from "./dtos/booking-conflict.dto";
-import { BookingListItemDto } from "./dtos/booking-list-item.dto";
 import { BookingResponseDto } from "./dtos/booking-response.dto";
 import { CustomerDetailsRequestDto } from "./dtos/customer-details-request.dto";
 import { ServicesRequestDto } from "./dtos/services-request.dto";
 
-// The 3-step booking flow (CONTEXT §1.2); a customer only reaches their own bookings.
+// The 3-step booking flow (CONTEXT §1.2); a customer only reaches their own bookings. Reads live in MyBookingsController.
 @Controller("bookings")
 @UseGuards(SessionGuard)
 @UseFilters(BookingsExceptionFilter)
@@ -31,8 +28,6 @@ import { ServicesRequestDto } from "./dtos/services-request.dto";
 export class BookingsController {
   constructor(
     @Inject(StartBooking) private readonly startBooking: StartBooking,
-    @Inject(GetBooking) private readonly getBooking: GetBooking,
-    @Inject(ListMyBookings) private readonly listMyBookings: ListMyBookings,
     @Inject(SaveCustomerDetails) private readonly saveCustomerDetails: SaveCustomerDetails,
     @Inject(SaveSchedule) private readonly saveSchedule: SaveSchedule,
     @Inject(SaveServices) private readonly saveServices: SaveServices,
@@ -52,23 +47,6 @@ export class BookingsController {
     @Body(new ZodValidationPipe(QuoteRequestDto)) body: QuoteRequestDto,
   ): Promise<BookingResponseDto> {
     return BookingResponseDto.from(await this.startBooking.execute(request.session.userId, body));
-  }
-
-  @Get()
-  @ApiOperation({ summary: "List the user's bookings in every status, newest created first (My bookings)" })
-  @ApiOkResponse({ description: "The user's bookings", standardSchema: BookingListItemDto.schema.array() })
-  async list(@Req() request: AuthenticatedRequest): Promise<BookingListItemDto[]> {
-    const summaries = await this.listMyBookings.execute(request.session.userId);
-    return summaries.map((summary) => BookingListItemDto.from(summary));
-  }
-
-  @Get(":id")
-  @ApiOperation({ summary: "Read one of the user's bookings" })
-  @ApiParam({ name: "id", type: String, format: "uuid" })
-  @ApiOkResponse({ description: "The booking", standardSchema: BookingResponseDto.schema })
-  @ApiError(404, "Booking not found (or another customer's)")
-  async get(@Req() request: AuthenticatedRequest, @Param("id", BookingIdPipe) id: string): Promise<BookingResponseDto> {
-    return BookingResponseDto.from(await this.getBooking.execute(request.session.userId, id));
   }
 
   @Put(":id/customer")

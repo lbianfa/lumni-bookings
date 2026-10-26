@@ -17,7 +17,9 @@ function bookingPath(bookingId: string) {
 }
 
 async function fetchBooking(bookingId: string): Promise<Booking> {
-  const { data } = await httpClient.get<Booking>(bookingPath(bookingId))
+  const { data } = await httpClient.get<Booking>(
+    `/my-bookings/${encodeURIComponent(bookingId)}`,
+  )
   return data
 }
 
@@ -35,7 +37,7 @@ export function bookingQueryOptions(bookingId: string) {
 export const myBookingsQueryOptions = queryOptions({
   queryKey: ['bookings'],
   queryFn: async () => {
-    const { data } = await httpClient.get<BookingListItem[]>('/bookings')
+    const { data } = await httpClient.get<BookingListItem[]>('/my-bookings')
     return data
   },
   retry: false,

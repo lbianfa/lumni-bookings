@@ -23,13 +23,14 @@ import { SaveServices } from "./application/save-services.use-case";
 import { StartBooking } from "./application/start-booking.use-case";
 import { BookingRepository } from "./domain/repos/booking.repo";
 import { BookingsController } from "./http/bookings.controller";
+import { MyBookingsController } from "./http/my-bookings.controller";
 import { PrismaBookingRepository } from "./infrastructure/prisma-booking.repo";
 
 // Owns the booking flow; the internal modules provide the repositories of its parts.
 // Keeps exporting the booking repository for the quote's availability check.
 @Module({
   imports: [AuthModule, RoomsModule, CustomersModule, ServicesModule, BookingLinesModule, BookingServicesModule],
-  controllers: [BookingsController],
+  controllers: [BookingsController, MyBookingsController],
   providers: [
     { provide: BookingRepository, useClass: PrismaBookingRepository },
     // Provided here, not imported: QuotesModule imports this module, so importing it back would be a module cycle.

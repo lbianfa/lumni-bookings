@@ -57,7 +57,7 @@ export interface Booking {
   createdAt: string
 }
 
-/** One row of `GET /api/bookings`: the session customer's bookings, newest first. */
+/** One row of `GET /api/my-bookings`: the session customer's bookings, newest first. */
 export interface BookingListItem {
   id: string
   /** `BK-<id>`. */
