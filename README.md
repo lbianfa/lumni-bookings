@@ -52,6 +52,7 @@ Requirements stated explicitly in the guide are specifications and live in [`CON
 |----|----------|-------|
 | P-01 | AI provider and model. | Free choice; key goes in an environment variable. |
 | P-02 | Seed data: how many rooms per size, their names and capacities. | The two seeded users are decided in D-20. |
+| P-03 | How the SPA is served in production. | It is a static build (`dist/`); the `/api` proxy exists only in `vite dev`. The session cookie (D-19) needs the SPA and `/api` on the same origin. Options: NestJS serves `dist/` with `@nestjs/serve-static` (one process, one domain), or a reverse proxy / CDN serves `dist/` and routes `/api/*` to the API (separate deploys, more infrastructure). |
 
 ## AI usage
 

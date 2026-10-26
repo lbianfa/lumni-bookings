@@ -52,6 +52,7 @@ Los requisitos que la guía establece explícitamente son especificaciones y est
 |----|----------|-------|
 | P-01 | Proveedor y modelo de IA. | Libre elección; la clave va en una variable de entorno. |
 | P-02 | Datos semilla: cuántas salas hay por tamaño, sus nombres y capacidades. | Los dos usuarios sembrados se decidieron en D-20. |
+| P-03 | Cómo se sirve la SPA en producción. | Es un build estático (`dist/`); el proxy de `/api` solo existe en `vite dev`. La cookie de sesión (D-19) necesita que la SPA y `/api` estén en el mismo origen. Opciones: NestJS sirve `dist/` con `@nestjs/serve-static` (un proceso, un dominio), o un reverse proxy / CDN sirve `dist/` y enruta `/api/*` a la API (deploys separados, más infraestructura). |
 
 ## Uso de IA
 
