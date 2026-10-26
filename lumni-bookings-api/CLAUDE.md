@@ -44,6 +44,18 @@ migrations/                  # Prisma 8 migrations (generated, then reviewed)
 
 File names are kebab-case (`create-booking.use-case.ts`, `booking.entity.ts`). The starter `User`/`Post` models, `src/users.*`, `src/prisma/users.ts`, and `src/prisma.service.ts` are scaffold samples: replace them with the real features instead of building on them.
 
+## Where to apply the layers
+
+Clean Architecture is applied selectively. Use the full layers only where business rules live; keep everything else thin.
+
+- **Full layers** (`domain`, `application`, `infrastructure`, `http`): features with business rules or swappable infrastructure.
+  - `bookings`: quote, multi-step draft, confirmation, state transitions, availability, price agreed once.
+  - The email outbox and its `EmailSender` port (D-08, D-10).
+  - The AI booking assistant and its provider port (P-01).
+- **Thin** (`http` + `infrastructure`, no `domain` or `application`): plain CRUD and read-only queries with no rules, such as listing rooms, the admin booking list, and reports. The controller calls a repository or query that returns the response DTO directly; no entities, no use case, no port.
+- A thin feature gets full layers only when a real rule appears. Do not add layers, ports, or mappings "for the future".
+- Every port must have a reason: more than one implementation (now or decided), or a dependency the tests must replace (clock, external APIs). No port for a class with a single, stable implementation.
+
 ## Dependency rule
 
 - `domain` imports nothing from NestJS, Prisma, or any other layer.
