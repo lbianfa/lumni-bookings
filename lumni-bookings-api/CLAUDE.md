@@ -30,29 +30,34 @@ Organize by feature first, then by layer:
 
 ```
 src/
-  <feature>/                 # e.g. bookings, rooms
-    domain/                  # entities, value objects, domain errors, repository ports
+  <feature>/                 # e.g. quotes, bookings, rooms
+    domain/
+      entities/              #   entities
+      exceptions.ts          #   the feature's domain errors
+      repos/                 #   repository ports (abstract classes), named `<entity>.repo.ts`
+      core/                  #   domain logic and value objects (pricing, availability, time slot, business time)
     application/             # use cases and the ports they need
-    infrastructure/          # Prisma repositories, external adapters (Resend, AI)
+    infrastructure/          # Prisma repositories (`prisma-<entity>.repo.ts`), external adapters (Resend, AI)
     http/                    # controllers, guards, exception filters; request/response DTOs in http/dtos/
     <feature>.module.ts      # wires ports to adapters
   prisma/                    # Prisma contract, generated types, db client, seed (persistence only)
-  shared/                    # cross-feature kernel (clock, ids, base errors) and http/ helpers (pipes, filters) only
+  shared/                    # cross-feature kernel (clock, ids, base errors) and http/ helpers (pipes, filters, money formatting) only
 module.ts, service.ts        # Prisma Composer app definition (scaffold, root level)
 migrations/                  # Prisma 8 migrations (generated, then reviewed)
 ```
 
-File names are kebab-case (`create-booking.use-case.ts`, `booking.entity.ts`). `auth` is a thin feature (`http` + `infrastructure`): login, logout, and the current user (D-19, D-20). `rooms` is thin too (`GET /api/rooms`). `bookings` has full layers; so far it holds the quote (`POST /api/quotes`).
+File names are kebab-case (`create-booking.use-case.ts`, `booking.entity.ts`). `auth` is a thin feature (`http` + `infrastructure`): login, logout, and the current user (D-19, D-20). `quotes` has full layers (`POST /api/quotes`). `rooms` and `bookings` own their entity's repository: `RoomsModule` and `BookingsModule` export `RoomRepository` and `BookingRepository`, and `QuotesModule` imports both. `rooms` has full layers too: `GET /api/rooms` goes through the `ListRooms` use case. `bookings` holds, for now, only its repository.
 
 ## Where to apply the layers
 
 Clean Architecture is applied selectively. Use the full layers only where business rules live; keep everything else thin.
 
 - **Full layers** (`domain`, `application`, `infrastructure`, `http`): features with business rules or swappable infrastructure.
-  - `bookings`: quote, multi-step draft, confirmation, state transitions, availability, price agreed once.
+  - `quotes`: price, opening hours, availability and the next free slot.
+  - `bookings`: multi-step draft, confirmation, state transitions, price agreed once.
   - The email outbox and its `EmailSender` port (D-08, D-10).
   - The AI booking assistant and its provider port (P-01).
-- **Thin** (`http` + `infrastructure`, no `domain` or `application`): plain CRUD and read-only queries with no rules, such as listing rooms, the admin booking list, and reports. The controller calls a repository or query that returns the response DTO directly; no entities, no use case, no port.
+- **Thin** (`http` + `infrastructure`, no `domain` or `application`): plain CRUD and read-only queries with no rules, such as the admin booking list and reports. The controller calls a repository or query that returns the response DTO directly; no entities, no use case, no port.
 - A thin feature gets full layers only when a real rule appears. Do not add layers, ports, or mappings "for the future".
 - Every port must have a reason: more than one implementation (now or decided), or a dependency the tests must replace (clock, external APIs). No port for a class with a single, stable implementation.
 
@@ -69,7 +74,7 @@ Clean Architecture is applied selectively. Use the full layers only where busine
 - Always inject with an explicit token: `constructor(@Inject(BookingRepository) private readonly bookings: BookingRepository)`. `pnpm dev` runs through `tsx` (esbuild), which does not emit the decorator metadata Nest needs to inject by type alone; the scaffold injects with explicit tokens everywhere.
 - Bind adapters in the feature module: `{ provide: BookingRepository, useClass: PrismaBookingRepository }`.
 - `PrismaModule` (`src/prisma.module.ts`) is global and imported once in `AppModule`. Inject `PrismaService` directly in infrastructure classes; never add it to a feature module's `providers`, which would create a second instance.
-- Existing ports: `Clock` (`src/shared/domain`, bound to `SystemClock`); `RoomRepository` and `BookingRepository` (`src/bookings/domain`, Prisma adapters). Planned: `EmailSender` (D-10).
+- Existing ports: `Clock` (`src/shared/domain`, bound to `SystemClock`); `RoomRepository` (`src/rooms/domain/repos`) and `BookingRepository` (`src/bookings/domain/repos`), both with Prisma adapters and exported by their feature module. Planned: `EmailSender` (D-10).
 
 ## TypeScript and modules
 
