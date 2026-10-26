@@ -53,6 +53,8 @@ export interface Booking {
   services: BookingService[]
   quotedAt: string
   confirmedAt: string | null
+  /** When the draft was started. */
+  createdAt: string
 }
 
 /** One row of `GET /api/bookings`: the session customer's bookings, newest first. */

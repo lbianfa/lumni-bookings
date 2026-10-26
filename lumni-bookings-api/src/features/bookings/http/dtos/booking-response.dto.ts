@@ -42,6 +42,7 @@ const bookingResponseSchema = z.object({
     .describe("The whole services catalog at current prices, with the draft's selection"),
   quotedAt: z.iso.datetime(),
   confirmedAt: z.iso.datetime().nullable(),
+  createdAt: z.iso.datetime().describe("When the draft was started"),
 });
 
 // `schema` documents the response; the class must keep matching it.
@@ -72,6 +73,7 @@ export class BookingResponseDto implements z.infer<typeof bookingResponseSchema>
   readonly services: { id: string; code: string; name: string; price: string; selected: boolean }[];
   readonly quotedAt: string;
   readonly confirmedAt: string | null;
+  readonly createdAt: string;
 
   private constructor({ booking, customer, room, lines, services, selectedServiceIds }: BookingDetails) {
     const slot = booking.slot;
@@ -118,6 +120,7 @@ export class BookingResponseDto implements z.infer<typeof bookingResponseSchema>
     }));
     this.quotedAt = booking.quotedAt.toISOString();
     this.confirmedAt = booking.confirmedAt?.toISOString() ?? null;
+    this.createdAt = booking.createdAt.toISOString();
   }
 
   static from(details: BookingDetails): BookingResponseDto {

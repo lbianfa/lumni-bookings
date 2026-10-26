@@ -10,9 +10,11 @@ import { ServicesStep } from './steps/services-step'
 interface BookingWizardProps {
   /** A draft: only drafts can be edited. */
   booking: Booking
+  /** Called once the booking is confirmed from step 3. */
+  onConfirmed: () => void
 }
 
-export function BookingWizard({ booking }: BookingWizardProps) {
+export function BookingWizard({ booking, onConfirmed }: BookingWizardProps) {
   // Opens on the furthest step reached, so a reopened draft resumes there.
   const [step, setStep] = useState(booking.currentStep)
   const [saved, setSaved] = useState(false)
@@ -55,6 +57,7 @@ export function BookingWizard({ booking }: BookingWizardProps) {
           booking={booking}
           onBack={() => setStep(2)}
           onSaved={() => setSaved(true)}
+          onConfirmed={onConfirmed}
         />
       )}
     </div>

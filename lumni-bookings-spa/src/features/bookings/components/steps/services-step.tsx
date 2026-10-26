@@ -1,7 +1,10 @@
 import { formatCop } from '../../../quotes/format'
 import type { Booking, BookingService } from '../../booking.types'
 import { bookingErrorMessage } from '../../errors'
-import { useConfirmBookingMutation, useSaveServicesMutation } from '../../queries'
+import {
+  useConfirmBookingMutation,
+  useSaveServicesMutation,
+} from '../../queries'
 import { BookingSummary } from '../booking-summary'
 
 // Icons for the seeded services (README D-14); any other service shows the generic one.
@@ -44,9 +47,16 @@ interface ServicesStepProps {
   booking: Booking
   onBack: () => void
   onSaved: () => void
+  /** Called once this page has confirmed the booking. */
+  onConfirmed: () => void
 }
 
-export function ServicesStep({ booking, onBack, onSaved }: ServicesStepProps) {
+export function ServicesStep({
+  booking,
+  onBack,
+  onSaved,
+  onConfirmed,
+}: ServicesStepProps) {
   const saveServices = useSaveServicesMutation(booking.id)
   const confirm = useConfirmBookingMutation(booking.id)
   const busy = saveServices.isPending || confirm.isPending
@@ -135,7 +145,7 @@ export function ServicesStep({ booking, onBack, onSaved }: ServicesStepProps) {
           aria-busy={confirm.isPending}
           onClick={() => {
             saveServices.reset()
-            confirm.mutate()
+            confirm.mutate(undefined, { onSuccess: onConfirmed })
           }}
           className="flex min-h-[52px] items-center justify-center rounded-xl bg-brand text-base font-bold text-white hover:bg-brand-strong disabled:cursor-not-allowed disabled:opacity-60"
         >

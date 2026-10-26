@@ -26,6 +26,13 @@ interface BookingListItemProps {
 
 export function BookingListItem({ booking }: BookingListItemProps) {
   const cancelled = booking.status === 'cancelled'
+  // Drafts resume the form; confirmed bookings open their detail; the rest link nowhere.
+  const action =
+    booking.status === 'draft'
+      ? 'Resume booking'
+      : booking.status === 'confirmed'
+        ? 'View booking'
+        : null
 
   return (
     <li className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-[14px] border border-line bg-white p-5">
@@ -55,14 +62,14 @@ export function BookingListItem({ booking }: BookingListItemProps) {
         >
           {formatCop(booking.total)}
         </span>
-        {booking.status === 'draft' && (
+        {action && (
           <Link
             to="/bookings/$bookingId"
             params={{ bookingId: booking.id }}
-            aria-label={`Resume booking ${booking.reference}`}
+            aria-label={`${action} ${booking.reference}`}
             className="inline-flex min-h-11 items-center justify-center rounded-xl border border-brand px-[18px] text-sm font-bold text-brand-strong no-underline hover:bg-brand-tint"
           >
-            Resume booking
+            {action}
           </Link>
         )}
       </div>

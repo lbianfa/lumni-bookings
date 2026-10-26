@@ -1,6 +1,11 @@
 import { Link } from '@tanstack/react-router'
 
-export function MyBookingsLink() {
+interface MyBookingsLinkProps {
+  /** A back arrow instead of the list icon, for a page opened from My bookings. */
+  back?: boolean
+}
+
+export function MyBookingsLink({ back = false }: MyBookingsLinkProps) {
   return (
     <Link
       to="/bookings"
@@ -17,12 +22,21 @@ export function MyBookingsLink() {
         strokeLinejoin="round"
         aria-hidden="true"
       >
-        <path d="M8 6h13" />
-        <path d="M8 12h13" />
-        <path d="M8 18h13" />
-        <path d="M3 6h.01" />
-        <path d="M3 12h.01" />
-        <path d="M3 18h.01" />
+        {back ? (
+          <>
+            <path d="M19 12H5" />
+            <path d="m12 19-7-7 7-7" />
+          </>
+        ) : (
+          <>
+            <path d="M8 6h13" />
+            <path d="M8 12h13" />
+            <path d="M8 18h13" />
+            <path d="M3 6h.01" />
+            <path d="M3 12h.01" />
+            <path d="M3 18h.01" />
+          </>
+        )}
       </svg>
       My bookings
     </Link>

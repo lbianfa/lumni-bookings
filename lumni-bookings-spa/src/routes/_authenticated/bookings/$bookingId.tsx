@@ -1,4 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import type { ErrorComponentProps } from '@tanstack/react-router'
 import { ApiError } from '../../../api/http-client'
@@ -33,12 +34,21 @@ export const Route = createFileRoute('/_authenticated/bookings/$bookingId')({
 function BookingPage() {
   const { bookingId } = Route.useParams()
   const { data: booking } = useSuspenseQuery(bookingQueryOptions(bookingId))
+  // The confirmation banner shows only right after confirming here, not when the detail is opened later.
+  const [confirmedId, setConfirmedId] = useState<string | null>(null)
 
   // Only drafts can be edited; any other status is shown read-only.
   return booking.status === 'draft' ? (
-    <BookingWizard key={booking.id} booking={booking} />
+    <BookingWizard
+      key={booking.id}
+      booking={booking}
+      onConfirmed={() => setConfirmedId(booking.id)}
+    />
   ) : (
-    <BookingRecord booking={booking} />
+    <BookingRecord
+      booking={booking}
+      justConfirmed={confirmedId === booking.id}
+    />
   )
 }
 

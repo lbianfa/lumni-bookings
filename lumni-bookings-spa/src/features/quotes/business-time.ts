@@ -48,6 +48,17 @@ export function startTimeOptions(date: string, now = businessNow()): string[] {
   return times
 }
 
+/** `Sat, Oct 31, 2026` for `2026-10-31`. */
+export function formatFullDateLabel(date: string): string {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
+    timeZone: 'UTC',
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
 /** `Sat, Oct 31` for `2026-10-31`. */
 export function formatDateLabel(date: string): string {
   return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-US', {
