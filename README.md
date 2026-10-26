@@ -6,7 +6,7 @@ Room booking app for a coworking: customers quote and book rooms, admins manage 
 
 Requirements are summarized in [`CONTEXT.md`](CONTEXT.md) (source: technical assessment guide, Parts 1 and 2).
 
-> Status: planning. The frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) and API ([`lumni-bookings-api`](lumni-bookings-api)) scaffolds exist; no features yet. This README records decisions so far; the "Guarantees" section will be completed during implementation.
+> Status: in progress. Built so far in the frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) and API ([`lumni-bookings-api`](lumni-bookings-api)): sign-in (D-19, D-20) and the room quote (CONTEXT §1.1, D-21, D-22). The 3-step booking flow comes next. This README records decisions so far; the "Guarantees" section will be completed during implementation.
 
 ## Tech stack
 
@@ -46,12 +46,13 @@ Requirements stated explicitly in the guide are specifications and live in [`CON
 | D-18 | Drafts are never deleted. A draft keeps its quoted price and when it was quoted (`quoted_at`). It can be confirmed if that price matches the price recomputed with the current room rate and service prices; if prices changed, only while the quote is less than two weeks old, and the quoted price is honored. Otherwise the customer must quote again. | Keeps the full history; a quote stays valid for two weeks, and after that only while prices have not changed. | Own decision |
 | D-19 | Sessions use a JWT signed by the API and stored in an httpOnly, `SameSite=Lax` cookie (`Secure` in production), valid for 8 hours. The SPA calls the API under `/api` on the same origin (Vite proxy in development), so there is no CORS. Passwords are stored as bcrypt hashes (`bcryptjs`, cost 12). Wrong email and wrong password return the same `401`. | JavaScript cannot read the token, so an XSS cannot steal it; the API stays stateless. Logout clears the cookie, but a token cannot be revoked before it expires. | Own decision |
 | D-20 | Two seeded demo users: `customer@lumni.test` (customer) and `admin@lumni.test` (admin), both with password `lumni-demo`. The login page offers one-click demo buttons that use them. | The guide asks for two seeded users; fixed, documented credentials make the demo usable without setup. | Own decision |
+| D-21 | A slot that has already started cannot be quoted or booked; there is no limit on how far ahead. The quote page offers only start times within that day's opening hours and, for today, only those not yet passed. "Now" comes from a clock in `America/Bogota` (D-02). | The guide does not say; booking the past has no business meaning, and a forward limit would be an invented rule. | Own decision |
+| D-22 | Twelve seeded rooms: `Room S1`–`Room S5` small (capacity 4), `Room M1`–`Room M4` medium (capacity 8), `Room L1`–`Room L3` large (capacity 16), each with its size's hourly rate. `pnpm db:seed` creates or resets them by name. | Enough rooms per size to exercise availability and the assistant's capacity matching (D-12). | Own decision |
 ## Pending decisions
 
 | ID | Question | Notes |
 |----|----------|-------|
 | P-01 | AI provider and model. | Free choice; key goes in an environment variable. |
-| P-02 | Seed data: how many rooms per size, their names and capacities. | The two seeded users are decided in D-20. |
 | P-03 | How the SPA is served in production. | It is a static build (`dist/`); the `/api` proxy exists only in `vite dev`. The session cookie (D-19) needs the SPA and `/api` on the same origin. Options: NestJS serves `dist/` with `@nestjs/serve-static` (one process, one domain), or a reverse proxy / CDN serves `dist/` and routes `/api/*` to the API (separate deploys, more infrastructure). |
 
 ## AI usage

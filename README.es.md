@@ -6,7 +6,7 @@ App de reservas de salas para un coworking: los clientes cotizan y reservan sala
 
 Los requisitos están resumidos en [`CONTEXT.es.md`](CONTEXT.es.md) (fuente: guía de la prueba técnica, Partes 1 y 2).
 
-> Estado: planificación. Existen los proyectos base del frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) y de la API ([`lumni-bookings-api`](lumni-bookings-api)); todavía no hay funcionalidades. Este README registra las decisiones hasta ahora; la sección "Garantías" se completará durante la implementación.
+> Estado: en progreso. Construido hasta ahora en el frontend ([`lumni-bookings-spa`](lumni-bookings-spa)) y la API ([`lumni-bookings-api`](lumni-bookings-api)): inicio de sesión (D-19, D-20) y la cotización de salas (CONTEXT §1.1, D-21, D-22). Sigue el flujo de reserva en 3 pasos. Este README registra las decisiones hasta ahora; la sección "Garantías" se completará durante la implementación.
 
 ## Stack tecnológico
 
@@ -46,12 +46,13 @@ Los requisitos que la guía establece explícitamente son especificaciones y est
 | D-18 | Los borradores nunca se eliminan. Un borrador guarda su precio cotizado y cuándo se cotizó (`quoted_at`). Se puede confirmar si ese precio coincide con el que resulta de recalcular con la tarifa actual de la sala y los precios actuales de los servicios; si los precios cambiaron, solo mientras la cotización tenga menos de dos semanas, y se respeta el precio cotizado. En otro caso, el cliente debe volver a cotizar. | Conserva todo el historial; una cotización es válida por dos semanas, y después solo mientras los precios no hayan cambiado. | Decisión propia |
 | D-19 | Las sesiones usan un JWT firmado por la API y guardado en una cookie httpOnly, `SameSite=Lax` (`Secure` en producción), válida por 8 horas. La SPA llama a la API bajo `/api` en el mismo origen (proxy de Vite en desarrollo), así que no hay CORS. Las contraseñas se guardan como hashes bcrypt (`bcryptjs`, costo 12). Un email incorrecto y una contraseña incorrecta devuelven el mismo `401`. | JavaScript no puede leer el token, así que un XSS no puede robarlo; la API sigue sin estado. El logout borra la cookie, pero un token no se puede revocar antes de que expire. | Decisión propia |
 | D-20 | Dos usuarios demo sembrados: `customer@lumni.test` (cliente) y `admin@lumni.test` (administrador), ambos con la contraseña `lumni-demo`. La página de login ofrece botones demo de un clic que los usan. | La guía pide dos usuarios sembrados; credenciales fijas y documentadas hacen que la demo funcione sin configuración. | Decisión propia |
+| D-21 | Un horario que ya empezó no se puede cotizar ni reservar; no hay límite hacia adelante. La página de cotización ofrece solo horas de inicio dentro del horario de apertura de ese día y, para hoy, solo las que aún no pasaron. "Ahora" sale de un reloj en `America/Bogota` (D-02). | La guía no lo dice; reservar en el pasado no tiene sentido de negocio, y un límite hacia adelante sería una regla inventada. | Decisión propia |
+| D-22 | Doce salas sembradas: `Room S1`–`Room S5` pequeñas (capacidad 4), `Room M1`–`Room M4` medianas (capacidad 8), `Room L1`–`Room L3` grandes (capacidad 16), cada una con la tarifa por hora de su tamaño. `pnpm db:seed` las crea o restablece por nombre. | Suficientes salas por tamaño para ejercitar la disponibilidad y la búsqueda por capacidad del asistente (D-12). | Decisión propia |
 ## Decisiones pendientes
 
 | ID | Pregunta | Notas |
 |----|----------|-------|
 | P-01 | Proveedor y modelo de IA. | Libre elección; la clave va en una variable de entorno. |
-| P-02 | Datos semilla: cuántas salas hay por tamaño, sus nombres y capacidades. | Los dos usuarios sembrados se decidieron en D-20. |
 | P-03 | Cómo se sirve la SPA en producción. | Es un build estático (`dist/`); el proxy de `/api` solo existe en `vite dev`. La cookie de sesión (D-19) necesita que la SPA y `/api` estén en el mismo origen. Opciones: NestJS sirve `dist/` con `@nestjs/serve-static` (un proceso, un dominio), o un reverse proxy / CDN sirve `dist/` y enruta `/api/*` a la API (deploys separados, más infraestructura). |
 
 ## Uso de IA
