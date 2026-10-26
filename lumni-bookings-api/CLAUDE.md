@@ -26,28 +26,31 @@ When they conflict, these rules win, then the official Prisma skills, then the t
 
 ## Layout (screaming architecture)
 
-Organize by feature first, then by layer:
+Organize by feature first, then by layer. Business feature modules live in `src/features/`; cross-cutting code (auth, shared kernel, persistence, app bootstrap) stays at the root of `src/`:
 
 ```
 src/
-  <feature>/                 # e.g. quotes, bookings, rooms
-    domain/
-      entities/              #   entities
-      exceptions.ts          #   the feature's domain errors
-      repos/                 #   repository ports (abstract classes), named `<entity>.repo.ts`
-      core/                  #   domain logic and value objects (pricing, availability, time slot, business time)
-    application/             # use cases and the ports they need
-      helpers/               #   injectable services several use cases share (no `execute`), e.g. access checks, quoting
-    infrastructure/          # Prisma repositories (`prisma-<entity>.repo.ts`), external adapters (Resend, AI)
-    http/                    # controllers, guards, exception filters; request/response DTOs in http/dtos/
-    <feature>.module.ts      # wires ports to adapters
+  features/
+    <feature>/               # e.g. quotes, bookings, rooms, and the internal modules
+      domain/
+        entities/            #   entities
+        exceptions.ts        #   the feature's domain errors
+        repos/               #   repository ports (abstract classes), named `<entity>.repo.ts`
+        core/                #   domain logic and value objects (pricing, availability, time slot, business time)
+      application/           # use cases and the ports they need
+        helpers/             #   injectable services several use cases share (no `execute`), e.g. access checks, quoting
+      infrastructure/        # Prisma repositories (`prisma-<entity>.repo.ts`), external adapters (Resend, AI)
+      http/                  # controllers, guards, exception filters; request/response DTOs in http/dtos/
+      <feature>.module.ts    # wires ports to adapters
+  auth/                      # session login, logout and guards used by every feature (D-19, D-20)
   prisma/                    # Prisma contract, generated types, db client, seed (persistence only)
   shared/                    # cross-feature kernel (clock, unit of work, ids, base errors), their adapters, and http/ helpers (pipes, filters, money formatting) only
+  main.ts, app.module.ts     # bootstrap; `prisma.module.ts` and `prisma.service.ts` wire the global Prisma client
 module.ts, service.ts        # Prisma Composer app definition (scaffold, root level)
 migrations/                  # Prisma 8 migrations (generated, then reviewed)
 ```
 
-File names are kebab-case (`create-booking.use-case.ts`, `booking.entity.ts`). `auth` is a thin feature (`http` + `infrastructure`): login, logout, and the current user (D-19, D-20). `quotes` has full layers (`POST /api/quotes`). `rooms` and `bookings` own their entity's repository: `RoomsModule` and `BookingsModule` export `RoomRepository` and `BookingRepository`, and `QuotesModule` imports both. `rooms` has full layers too: `GET /api/rooms` goes through the `ListRooms` use case. `bookings` has full layers and the booking endpoints (`/api/bookings`); since `QuotesModule` imports `BookingsModule`, `BookingsModule` provides `QuoteRoom` itself rather than importing `QuotesModule` back.
+File names are kebab-case (`create-booking.use-case.ts`, `booking.entity.ts`). `auth` is a thin cross-cutting module at the root of `src/` (`http` + `infrastructure`): login, logout, and the current user (D-19, D-20). `quotes` has full layers (`POST /api/quotes`). `rooms` and `bookings` own their entity's repository: `RoomsModule` and `BookingsModule` export `RoomRepository` and `BookingRepository`, and `QuotesModule` imports both. `rooms` has full layers too: `GET /api/rooms` goes through the `ListRooms` use case. `bookings` has full layers and the booking endpoints (`/api/bookings`); since `QuotesModule` imports `BookingsModule`, `BookingsModule` provides `QuoteRoom` itself rather than importing `QuotesModule` back.
 
 Internal modules: the parts of the booking that are separate tables live in their own feature folders, without `http` or `application`: `customers`, `services`, `booking-lines`, `booking-services`. Each has `domain/` (entity and repository port) and `infrastructure/` (Prisma adapter), and its module exports only the repository. Only `bookings` imports them. Writes that span several of these repositories run in one transaction through the `UnitOfWork` port (`src/shared/application/unit-of-work.ts`): `run(work)` hands `work` an opaque `Transaction`, use cases pass it to every repository call, and Prisma adapters query through `ormOf(prisma, tx)` (`src/shared/infrastructure/prisma-unit-of-work.ts`).
 
