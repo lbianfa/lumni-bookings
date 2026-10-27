@@ -1,0 +1,151 @@
+[
+  {
+    "id": "table.EmailAttempt",
+    "label": "Create table \"EmailAttempt\"",
+    "summary": "Creates table \"EmailAttempt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "EmailAttempt"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"EmailAttempt\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmailAttempt\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"EmailAttempt\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"EmailAttempt\"",
+        "sql": "CREATE TABLE \"public\".\"EmailAttempt\" (\n  \"attemptedAt\" timestamptz NOT NULL,\n  \"createdAt\" timestamptz NOT NULL,\n  \"emailId\" character(36) NOT NULL,\n  \"error\" text,\n  \"id\" character(36) NOT NULL,\n  \"outcome\" text NOT NULL,\n  \"providerMessageId\" text,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"EmailAttempt_outcome_check_75423ccf\" CHECK (\"outcome\" IN ('sent', 'failed'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"EmailAttempt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"EmailAttempt\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"EmailAttempt\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "index.EmailAttempt.EmailAttempt_emailId_idx_f0213919",
+    "label": "Create index \"EmailAttempt_emailId_idx_f0213919\" on \"EmailAttempt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "EmailAttempt_emailId_idx_f0213919",
+        "table": "EmailAttempt"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"EmailAttempt_emailId_idx_f0213919\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmailAttempt_emailId_idx_f0213919\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"EmailAttempt_emailId_idx_f0213919\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"EmailAttempt_emailId_idx_f0213919\"",
+        "sql": "CREATE INDEX \"EmailAttempt_emailId_idx_f0213919\" ON \"public\".\"EmailAttempt\" (\"emailId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"EmailAttempt_emailId_idx_f0213919\" exists on \"EmailAttempt\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"EmailAttempt_emailId_idx_f0213919\"",
+          "i",
+          "I",
+          "\"public\".\"EmailAttempt\"",
+          "btree",
+          "[\"emailId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.EmailAttempt.EmailAttempt_emailId_fkey",
+    "label": "Add foreign key \"EmailAttempt_emailId_fkey\" on \"EmailAttempt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "EmailAttempt_emailId_fkey",
+        "table": "EmailAttempt"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"EmailAttempt_emailId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "EmailAttempt_emailId_fkey",
+          "public",
+          "\"public\".\"EmailAttempt\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"EmailAttempt_emailId_fkey\" on \"EmailAttempt\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"EmailAttempt_emailId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"EmailAttempt\"\nADD CONSTRAINT \"EmailAttempt_emailId_fkey\"\nFOREIGN KEY (\"emailId\")\nREFERENCES \"public\".\"EmailOutbox\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"EmailAttempt_emailId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "EmailAttempt_emailId_fkey",
+          "public",
+          "\"public\".\"EmailAttempt\"",
+          "f",
+          "[\"emailId\"]",
+          "\"public\".\"EmailOutbox\"",
+          "[\"id\"]",
+          "r",
+          "a"
+        ]
+      }
+    ]
+  }
+]

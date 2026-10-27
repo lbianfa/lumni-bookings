@@ -68,3 +68,26 @@ export function formatDateLabel(date: string): string {
     day: 'numeric',
   })
 }
+
+/** `Oct 24, 16:02` for an ISO timestamp, in business time. */
+export function formatMoment(timestamp: string): string {
+  return new Date(timestamp).toLocaleString('en-US', {
+    timeZone: 'America/Bogota',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  })
+}
+
+/** `16:02:05` for an ISO timestamp, in business time. */
+export function formatClock(timestamp: string): string {
+  return new Date(timestamp).toLocaleTimeString('en-US', {
+    timeZone: 'America/Bogota',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hourCycle: 'h23',
+  })
+}

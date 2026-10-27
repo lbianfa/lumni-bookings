@@ -5,6 +5,7 @@ import { Temporal } from "temporal-polyfill";
 import { PrismaService } from "../../../prisma.service";
 import type { Transaction } from "../../../shared/application/unit-of-work";
 import { ormOf } from "../../../shared/infrastructure/prisma-unit-of-work";
+import type { EmailAttempt, EmailAttemptOutcome } from "../domain/entities/email-attempt";
 import { OutboxEmail, type EmailStatus, type EmailType, type NewOutboxEmail } from "../domain/entities/outbox-email";
 import { OutboxEmailRepository } from "../domain/repos/outbox-email.repo";
 
@@ -62,7 +63,15 @@ export class PrismaOutboxEmailRepository extends OutboxEmailRepository {
     return row ? toOutboxEmail(row) : null;
   }
 
-  async save(email: OutboxEmail, tx?: Transaction): Promise<void> {
+  async findByBooking(bookingId: string, type: EmailType, tx?: Transaction): Promise<OutboxEmail | null> {
+    const row = await ormOf(this.prisma, tx)
+      .public.EmailOutbox.select(...OUTBOX_FIELDS)
+      .where({ bookingId, type })
+      .first();
+    return row ? toOutboxEmail(row) : null;
+  }
+
+  async save(email: OutboxEmail, tx: Transaction): Promise<void> {
     await ormOf(this.prisma, tx)
       .public.EmailOutbox.where({ id: email.id })
       .select("id")
@@ -71,9 +80,38 @@ export class PrismaOutboxEmailRepository extends OutboxEmailRepository {
         attempts: email.attempts,
         lastError: email.lastError,
         providerMessageId: email.providerMessageId,
-        sentAt: email.sentAt ? Temporal.Instant.fromEpochMilliseconds(email.sentAt.getTime()) : null,
+        sentAt: email.sentAt ? toInstant(email.sentAt) : null,
       });
   }
+
+  async addAttempt(emailId: string, attempt: EmailAttempt, tx: Transaction): Promise<void> {
+    await ormOf(this.prisma, tx).public.EmailAttempt.create({
+      emailId,
+      attemptedAt: toInstant(attempt.attemptedAt),
+      outcome: attempt.outcome,
+      error: attempt.error,
+      providerMessageId: attempt.providerMessageId,
+    });
+  }
+
+  async findAttempts(emailId: string, tx?: Transaction): Promise<EmailAttempt[]> {
+    // The id (UUIDv7, time-ordered) breaks ties between attempts made in the same instant.
+    const rows = await ormOf(this.prisma, tx)
+      .public.EmailAttempt.select("attemptedAt", "outcome", "error", "providerMessageId")
+      .where({ emailId })
+      .orderBy([(a) => a.attemptedAt.asc(), (a) => a.id.asc()])
+      .all();
+    return rows.map((row) => ({
+      attemptedAt: new Date(row.attemptedAt.epochMilliseconds),
+      outcome: row.outcome as EmailAttemptOutcome,
+      error: row.error ?? null,
+      providerMessageId: row.providerMessageId ?? null,
+    }));
+  }
+}
+
+function toInstant(date: Date): Temporal.Instant {
+  return Temporal.Instant.fromEpochMilliseconds(date.getTime());
 }
 
 function toOutboxEmail(row: OutboxRow): OutboxEmail {

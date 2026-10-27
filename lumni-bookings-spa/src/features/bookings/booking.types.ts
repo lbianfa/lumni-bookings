@@ -102,3 +102,29 @@ export interface BookingFilters {
   status?: BookingStatus
   roomId?: string
 }
+
+export type EmailStatus = 'pending' | 'sent' | 'failed'
+
+/** One send attempt of an email. */
+export interface EmailAttempt {
+  /** ISO timestamp. */
+  attemptedAt: string
+  outcome: 'sent' | 'failed'
+  /** Why the provider did not take it; null when sent. */
+  error: string | null
+}
+
+/** `GET /api/bookings/:id/email` (admin only): the booking's confirmation email. */
+export interface BookingEmail {
+  type: 'booking_confirmation'
+  status: EmailStatus
+  toAddress: string
+  subject: string
+  /** Attempts made; emails queued before the history was kept list none. */
+  attemptCount: number
+  lastError: string | null
+  /** ISO timestamp, once sent. */
+  sentAt: string | null
+  /** Oldest first. */
+  attempts: EmailAttempt[]
+}

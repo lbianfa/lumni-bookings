@@ -9,6 +9,7 @@ import { ApiError, httpClient } from '../../api/http-client'
 import type {
   Booking,
   BookingCustomer,
+  BookingEmail,
   BookingFilters,
   BookingListItem,
   BookingPage,
@@ -45,6 +46,29 @@ export function adminBookingQueryOptions(bookingId: string) {
       return data
     },
     retry: false,
+  })
+}
+
+const PENDING_EMAIL_REFRESH_MS = 5000
+
+// The booking's confirmation email, for the admin: null when the booking has none (404), such as a draft.
+// While it is pending, it is read again so the box shows the send's outcome without a reload.
+export function adminBookingEmailQueryOptions(bookingId: string) {
+  return queryOptions({
+    queryKey: ['admin', 'bookings', bookingId, 'email'],
+    queryFn: async (): Promise<BookingEmail | null> => {
+      try {
+        const { data } = await httpClient.get<BookingEmail>(
+          `${bookingPath(bookingId)}/email`,
+        )
+        return data
+      } catch (error) {
+        if (error instanceof ApiError && error.status === 404) return null
+        throw error
+      }
+    },
+    refetchInterval: (query) =>
+      query.state.data?.status === 'pending' ? PENDING_EMAIL_REFRESH_MS : false,
   })
 }
 

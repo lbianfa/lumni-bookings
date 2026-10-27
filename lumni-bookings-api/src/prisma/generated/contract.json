@@ -20,6 +20,10 @@
       "model": "Customer",
       "namespace": "public"
     },
+    "EmailAttempt": {
+      "model": "EmailAttempt",
+      "namespace": "public"
+    },
     "EmailOutbox": {
       "model": "EmailOutbox",
       "namespace": "public"
@@ -59,6 +63,19 @@
               {
                 "name": "Cancelled",
                 "value": "cancelled"
+              }
+            ]
+          },
+          "EmailAttemptOutcome": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Sent",
+                "value": "sent"
+              },
+              {
+                "name": "Failed",
+                "value": "failed"
               }
             ]
           },
@@ -563,6 +580,116 @@
               },
               "namespaceId": "public",
               "table": "Customer"
+            }
+          },
+          "EmailAttempt": {
+            "fields": {
+              "attemptedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "emailId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/char@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 36
+                  }
+                }
+              },
+              "error": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "sql/char@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "length": 36
+                  }
+                }
+              },
+              "outcome": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "EmailAttemptOutcome",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "providerMessageId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "email": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "emailId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "EmailOutbox",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "attemptedAt": {
+                  "column": "attemptedAt"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "emailId": {
+                  "column": "emailId"
+                },
+                "error": {
+                  "column": "error"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "outcome": {
+                  "column": "outcome"
+                },
+                "providerMessageId": {
+                  "column": "providerMessageId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "EmailAttempt"
             }
           },
           "EmailOutbox": {
@@ -1432,6 +1559,102 @@
                 }
               ]
             },
+            "EmailAttempt": {
+              "checks": [
+                {
+                  "expression": "\"outcome\" IN ('sent', 'failed')",
+                  "name": "EmailAttempt_outcome_check_75423ccf",
+                  "prefix": "EmailAttempt_outcome_check"
+                }
+              ],
+              "columns": {
+                "attemptedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "dataType": "pg/timestamptz",
+                  "nullable": false
+                },
+                "emailId": {
+                  "codecId": "sql/char@1",
+                  "dataType": "pg/char",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 36
+                  }
+                },
+                "error": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "sql/char@1",
+                  "dataType": "pg/char",
+                  "nullable": false,
+                  "typeParams": {
+                    "length": 36
+                  }
+                },
+                "outcome": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "EmailAttemptOutcome",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "providerMessageId": {
+                  "codecId": "pg/text@1",
+                  "dataType": "pg/text",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "index": {
+                    "name": "EmailAttempt_emailId_idx_f0213919"
+                  },
+                  "onDelete": "restrict",
+                  "source": {
+                    "columns": [
+                      "emailId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "EmailAttempt"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "EmailOutbox"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "emailId"
+                  ],
+                  "name": "EmailAttempt_emailId_idx_f0213919",
+                  "prefix": "EmailAttempt_emailId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": []
+            },
             "EmailOutbox": {
               "checks": [
                 {
@@ -1824,6 +2047,13 @@
                 "cancelled"
               ]
             },
+            "EmailAttemptOutcome": {
+              "kind": "valueSet",
+              "values": [
+                "sent",
+                "failed"
+              ]
+            },
             "EmailStatus": {
               "kind": "valueSet",
               "values": [
@@ -1859,10 +2089,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "e05f1303b1c450cea79dd3b4300cdd0787c1272181ec909b103570dcb1588759"
+    "storageHash": "71d4ec4a71e9994cec823861e04baeab1ca9e48665ccbf988433cf1b1532b9d9"
   },
   "execution": {
-    "executionHash": "bc94ae760220e189b6886e703fe295458179d6604090a2dff122fad0260ad03d",
+    "executionHash": "f52981f959db294bdaedac2ec0b9312c22d9983f3683809b6c14d666a665dc73",
     "mutations": {
       "defaults": [
         {
@@ -1969,6 +2199,28 @@
           "ref": {
             "entry": "Customer",
             "field": "updatedAt",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestamptzStringNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "EmailAttempt",
+            "field": "createdAt",
+            "namespace": "public"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv7",
+            "kind": "generator"
+          },
+          "ref": {
+            "entry": "EmailAttempt",
+            "field": "id",
             "namespace": "public"
           }
         },

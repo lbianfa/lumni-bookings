@@ -1,3 +1,5 @@
+import type { EmailAttempt } from "./email-attempt";
+
 export type EmailType = "booking_confirmation";
 export type EmailStatus = "pending" | "sent" | "failed";
 
@@ -69,8 +71,8 @@ export class OutboxEmail {
     return `${KEY_PREFIXES[this.state.type]}/${this.state.bookingId}`;
   }
 
-  /** Records an attempt the provider accepted. */
-  markSent(providerMessageId: string, now: Date): void {
+  /** Records an attempt the provider accepted and returns it for the attempt history. */
+  markSent(providerMessageId: string, now: Date): EmailAttempt {
     this.state = {
       ...this.state,
       status: "sent",
@@ -79,10 +81,12 @@ export class OutboxEmail {
       providerMessageId,
       sentAt: now,
     };
+    return { attemptedAt: now, outcome: "sent", error: null, providerMessageId };
   }
 
-  /** Records an attempt that failed; nothing retries it yet. */
-  markFailed(error: string): void {
+  /** Records an attempt that failed (nothing retries it yet) and returns it for the attempt history. */
+  markFailed(error: string, now: Date): EmailAttempt {
     this.state = { ...this.state, status: "failed", attempts: this.state.attempts + 1, lastError: error };
+    return { attemptedAt: now, outcome: "failed", error, providerMessageId: null };
   }
 }

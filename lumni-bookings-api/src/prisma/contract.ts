@@ -38,8 +38,15 @@ const EmailStatus = enumType(
   member('Failed', 'failed'),
 );
 
+const EmailAttemptOutcome = enumType(
+  'EmailAttemptOutcome',
+  { codecId: 'pg/text@1', nativeType: 'text' },
+  member('Sent', 'sent'),
+  member('Failed', 'failed'),
+);
+
 export const contract = defineContract(
-  { enums: { UserRole, RoomSize, BookingStatus, EmailType, EmailStatus } },
+  { enums: { UserRole, RoomSize, BookingStatus, EmailType, EmailStatus, EmailAttemptOutcome } },
   ({ field, model, rel, type }) => {
     const Customer = model('Customer', {
       fields: {
@@ -174,8 +181,24 @@ export const contract = defineContract(
       uniques: [constraints.unique([fields.bookingId, fields.type])],
     }));
 
+    // One row per send attempt of an outbox email, for the admin's attempt history
+    const EmailAttempt = model('EmailAttempt', {
+      fields: {
+        id: field.id.uuidv7String(),
+        emailId: field.uuidString(),
+        attemptedAt: field.temporal.timestamptz(),
+        outcome: field.namedType(EmailAttemptOutcome),
+        error: field.text().optional(),
+        providerMessageId: field.text().optional(),
+        createdAt: field.temporal.createdAtString(),
+      },
+      relations: {
+        email: rel.belongsTo(EmailOutbox, { from: 'emailId', to: 'id' }).sql({ fk: { onDelete: 'restrict' } }),
+      },
+    });
+
     return {
-      models: { Customer, User, Room, Service, Booking, BookingLine, BookingService, EmailOutbox },
+      models: { Customer, User, Room, Service, Booking, BookingLine, BookingService, EmailOutbox, EmailAttempt },
     };
   },
 );

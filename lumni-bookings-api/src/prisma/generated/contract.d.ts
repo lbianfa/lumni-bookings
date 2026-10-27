@@ -23,9 +23,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'e05f1303b1c450cea79dd3b4300cdd0787c1272181ec909b103570dcb1588759'>;
+  StorageHashBase<'71d4ec4a71e9994cec823861e04baeab1ca9e48665ccbf988433cf1b1532b9d9'>;
 export type ExecutionHash =
-  ExecutionHashBase<'bc94ae760220e189b6886e703fe295458179d6604090a2dff122fad0260ad03d'>;
+  ExecutionHashBase<'f52981f959db294bdaedac2ec0b9312c22d9983f3683809b6c14d666a665dc73'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -247,6 +247,9 @@ type FieldTypeOverrides = {
           readonly input: 'draft' | 'confirmed' | 'completed' | 'cancelled';
         };
       };
+      readonly EmailAttempt: {
+        readonly outcome: { readonly output: 'sent' | 'failed'; readonly input: 'sent' | 'failed' };
+      };
       readonly EmailOutbox: {
         readonly status: {
           readonly output: 'pending' | 'sent' | 'failed';
@@ -293,6 +296,9 @@ type ColumnTypeOverrides = {
         readonly output: 'draft' | 'confirmed' | 'completed' | 'cancelled';
         readonly input: 'draft' | 'confirmed' | 'completed' | 'cancelled';
       };
+    };
+    readonly EmailAttempt: {
+      readonly outcome: { readonly output: 'sent' | 'failed'; readonly input: 'sent' | 'failed' };
     };
     readonly EmailOutbox: {
       readonly status: {
@@ -379,6 +385,17 @@ export namespace Models {
     updatedAt: FieldOutputTypes['public']['Customer']['updatedAt'];
     readonly [RelationKeys]?: never;
   };
+  export type public_EmailAttempt = {
+    attemptedAt: FieldOutputTypes['public']['EmailAttempt']['attemptedAt'];
+    createdAt: FieldOutputTypes['public']['EmailAttempt']['createdAt'];
+    emailId: FieldOutputTypes['public']['EmailAttempt']['emailId'];
+    error: FieldOutputTypes['public']['EmailAttempt']['error'];
+    id: FieldOutputTypes['public']['EmailAttempt']['id'];
+    outcome: FieldOutputTypes['public']['EmailAttempt']['outcome'];
+    providerMessageId: FieldOutputTypes['public']['EmailAttempt']['providerMessageId'];
+    email: public_EmailOutbox;
+    readonly [RelationKeys]?: 'email';
+  };
   export type public_EmailOutbox = {
     attempts: FieldOutputTypes['public']['EmailOutbox']['attempts'];
     body: FieldOutputTypes['public']['EmailOutbox']['body'];
@@ -435,6 +452,7 @@ export declare const models: {
     BookingLine: Models.public_BookingLine;
     BookingService: Models.public_BookingService;
     Customer: Models.public_Customer;
+    EmailAttempt: Models.public_EmailAttempt;
     EmailOutbox: Models.public_EmailOutbox;
     Room: Models.public_Room;
     Service: Models.public_Service;
@@ -770,6 +788,78 @@ type ContractBase = Omit<
               indexes: readonly [];
               foreignKeys: readonly [];
             };
+            readonly EmailAttempt: {
+              columns: {
+                readonly attemptedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly emailId: {
+                  readonly dataType: 'pg/char';
+                  readonly codecId: 'sql/char@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 36 };
+                  readonly many: false;
+                };
+                readonly error: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/char';
+                  readonly codecId: 'sql/char@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 36 };
+                  readonly many: false;
+                };
+                readonly outcome: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly providerMessageId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'EmailAttempt_emailId_idx_f0213919';
+                  readonly prefix: 'EmailAttempt_emailId_idx';
+                  readonly columns: readonly ['emailId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'EmailAttempt';
+                    readonly columns: readonly ['emailId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'EmailOutbox';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly EmailOutbox: {
               columns: {
                 readonly attempts: {
@@ -1060,6 +1150,10 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['draft', 'confirmed', 'completed', 'cancelled'];
             };
+            readonly EmailAttemptOutcome: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['sent', 'failed'];
+            };
             readonly EmailStatus: {
               readonly kind: 'valueSet';
               readonly values: readonly ['pending', 'sent', 'failed'];
@@ -1097,6 +1191,10 @@ type ContractBase = Omit<
       readonly model: 'BookingService';
     };
     readonly Customer: { readonly namespace: 'public' & NamespaceId; readonly model: 'Customer' };
+    readonly EmailAttempt: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'EmailAttempt';
+    };
     readonly EmailOutbox: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'EmailOutbox';
@@ -1426,6 +1524,79 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly EmailAttempt: {
+            readonly fields: {
+              readonly attemptedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly emailId: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/char@1';
+                  readonly typeParams: { readonly length: 36 };
+                };
+              };
+              readonly error: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/char@1';
+                  readonly typeParams: { readonly length: 36 };
+                };
+              };
+              readonly outcome: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly providerMessageId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+            };
+            readonly relations: {
+              readonly email: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'EmailOutbox';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['emailId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'EmailAttempt';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly attemptedAt: { readonly column: 'attemptedAt' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly emailId: { readonly column: 'emailId' };
+                readonly error: { readonly column: 'error' };
+                readonly id: { readonly column: 'id' };
+                readonly outcome: { readonly column: 'outcome' };
+                readonly providerMessageId: { readonly column: 'providerMessageId' };
+              };
+            };
+          };
           readonly EmailOutbox: {
             readonly fields: {
               readonly attempts: {
@@ -1739,6 +1910,13 @@ type ContractBase = Omit<
               { readonly name: 'Cancelled'; readonly value: 'cancelled' },
             ];
           };
+          readonly EmailAttemptOutcome: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Sent'; readonly value: 'sent' },
+              { readonly name: 'Failed'; readonly value: 'failed' },
+            ];
+          };
           readonly EmailStatus: {
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
@@ -1775,6 +1953,10 @@ type ContractBase = Omit<
             { readonly name: 'Confirmed'; readonly value: 'confirmed' },
             { readonly name: 'Completed'; readonly value: 'completed' },
             { readonly name: 'Cancelled'; readonly value: 'cancelled' },
+          ];
+          readonly EmailAttemptOutcome: readonly [
+            { readonly name: 'Sent'; readonly value: 'sent' },
+            { readonly name: 'Failed'; readonly value: 'failed' },
           ];
           readonly EmailStatus: readonly [
             { readonly name: 'Pending'; readonly value: 'pending' },
@@ -1900,6 +2082,22 @@ type ContractBase = Omit<
           readonly ref: {
             readonly entry: 'Customer';
             readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'EmailAttempt';
+            readonly field: 'createdAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv7'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'EmailAttempt';
+            readonly field: 'id';
             readonly namespace: 'public';
           };
         },

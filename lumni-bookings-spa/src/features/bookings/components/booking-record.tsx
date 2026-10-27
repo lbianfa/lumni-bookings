@@ -1,21 +1,9 @@
 import type { ReactNode } from 'react'
-import { formatFullDateLabel } from '../../quotes/business-time'
+import { formatFullDateLabel, formatMoment } from '../../quotes/business-time'
 import { SIZE_LABELS, formatHours } from '../../quotes/format'
 import type { Booking } from '../booking.types'
 import { PriceBreakdown } from './price-breakdown'
 import { StatusBadge } from './status-badge'
-
-/** `Oct 24, 16:02`, in business time (README D-02). */
-function formatMoment(timestamp: string): string {
-  return new Date(timestamp).toLocaleString('en-US', {
-    timeZone: 'America/Bogota',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  })
-}
 
 function DetailSection({
   id,
@@ -95,19 +83,24 @@ interface BookingRecordProps {
   backLink?: ReactNode
   /** True right after this page confirmed it: shows the confirmation banner. */
   justConfirmed?: boolean
+  /**
+   * A box beside the booking's sections, such as the admin's confirmation email; wraps below them on narrow screens.
+   * Without it, the sections take the whole row.
+   */
+  aside?: ReactNode
 }
 
-// The booking detail of the customer and the admin, after the admin detail design without the cancel action and
-// the email box.
+// The booking detail of the customer and the admin, after the admin detail design without the cancel action.
 export function BookingRecord({
   booking,
   backLink,
   justConfirmed = false,
+  aside,
 }: BookingRecordProps) {
   const services = booking.price.services
 
   return (
-    <div className="flex max-w-[760px] flex-col gap-6">
+    <div className="flex max-w-[1200px] flex-col gap-6">
       {backLink}
       <div className="flex flex-wrap items-center gap-3.5">
         <h1 className="m-0 font-mono text-[30px] font-medium tracking-[-0.01em] [overflow-wrap:anywhere]">
@@ -146,61 +139,68 @@ export function BookingRecord({
         </div>
       )}
 
-      <DetailSection id="booking-title" title="Booking">
-        <dl className="m-0 grid grid-cols-1 gap-x-6 gap-y-4 text-sm sm:grid-cols-2">
-          <Field label="Customer">{booking.customer.fullName}</Field>
-          <Field label="Email">{booking.customer.email}</Field>
-          <Field label="Company">{booking.customer.company ?? 'None'}</Field>
-          <Field label="Room">
-            {booking.room.name} ({SIZE_LABELS[booking.room.size]})
-          </Field>
-          <Field label="Date">{formatFullDateLabel(booking.date)}</Field>
-          <Field label="Time" mono>
-            {booking.startTime}–{booking.endTime} ·{' '}
-            {formatHours(booking.durationMinutes)}
-          </Field>
-          <Field label="Services">
-            {services.length > 0
-              ? services.map((service) => service.name).join(', ')
-              : 'None'}
-          </Field>
-        </dl>
-      </DetailSection>
+      <div className="flex flex-wrap items-start gap-6">
+        <div className="flex min-w-0 flex-[999_1_560px] flex-col gap-6">
+          <DetailSection id="booking-title" title="Booking">
+            <dl className="m-0 grid grid-cols-1 gap-x-6 gap-y-4 text-sm sm:grid-cols-2">
+              <Field label="Customer">{booking.customer.fullName}</Field>
+              <Field label="Email">{booking.customer.email}</Field>
+              <Field label="Company">
+                {booking.customer.company ?? 'None'}
+              </Field>
+              <Field label="Room">
+                {booking.room.name} ({SIZE_LABELS[booking.room.size]})
+              </Field>
+              <Field label="Date">{formatFullDateLabel(booking.date)}</Field>
+              <Field label="Time" mono>
+                {booking.startTime}–{booking.endTime} ·{' '}
+                {formatHours(booking.durationMinutes)}
+              </Field>
+              <Field label="Services">
+                {services.length > 0
+                  ? services.map((service) => service.name).join(', ')
+                  : 'None'}
+              </Field>
+            </dl>
+          </DetailSection>
 
-      <DetailSection
-        id="price-title"
-        title="Price"
-        aside={
-          booking.confirmedAt && (
-            <span className="text-[13px] text-muted">
-              Locked at confirmation · {formatMoment(booking.confirmedAt)}
-            </span>
-          )
-        }
-      >
-        <PriceBreakdown
-          price={booking.price}
-          durationMinutes={booking.durationMinutes}
-          hourlyRate={booking.room.hourlyRate}
-        />
-      </DetailSection>
-
-      <DetailSection id="history-title" title="Status history">
-        <ol className="m-0 flex list-none flex-col gap-3.5 p-0 text-sm">
-          <HistoryEntry
-            dot="bg-line-strong"
-            label="Draft created"
-            at={booking.createdAt}
-          />
-          {booking.confirmedAt && (
-            <HistoryEntry
-              dot="bg-brand"
-              label="Confirmed"
-              at={booking.confirmedAt}
+          <DetailSection
+            id="price-title"
+            title="Price"
+            aside={
+              booking.confirmedAt && (
+                <span className="text-[13px] text-muted">
+                  Locked at confirmation · {formatMoment(booking.confirmedAt)}
+                </span>
+              )
+            }
+          >
+            <PriceBreakdown
+              price={booking.price}
+              durationMinutes={booking.durationMinutes}
+              hourlyRate={booking.room.hourlyRate}
             />
-          )}
-        </ol>
-      </DetailSection>
+          </DetailSection>
+
+          <DetailSection id="history-title" title="Status history">
+            <ol className="m-0 flex list-none flex-col gap-3.5 p-0 text-sm">
+              <HistoryEntry
+                dot="bg-line-strong"
+                label="Draft created"
+                at={booking.createdAt}
+              />
+              {booking.confirmedAt && (
+                <HistoryEntry
+                  dot="bg-brand"
+                  label="Confirmed"
+                  at={booking.confirmedAt}
+                />
+              )}
+            </ol>
+          </DetailSection>
+        </div>
+        {aside}
+      </div>
     </div>
   )
 }
