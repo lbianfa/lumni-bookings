@@ -24,8 +24,22 @@ const BookingStatus = enumType(
   member('Cancelled', 'cancelled'),
 );
 
+const EmailType = enumType(
+  'EmailType',
+  { codecId: 'pg/text@1', nativeType: 'text' },
+  member('BookingConfirmation', 'booking_confirmation'),
+);
+
+const EmailStatus = enumType(
+  'EmailStatus',
+  { codecId: 'pg/text@1', nativeType: 'text' },
+  member('Pending', 'pending'),
+  member('Sent', 'sent'),
+  member('Failed', 'failed'),
+);
+
 export const contract = defineContract(
-  { enums: { UserRole, RoomSize, BookingStatus } },
+  { enums: { UserRole, RoomSize, BookingStatus, EmailType, EmailStatus } },
   ({ field, model, rel, type }) => {
     const Customer = model('Customer', {
       fields: {
@@ -133,8 +147,35 @@ export const contract = defineContract(
       id: constraints.id([fields.bookingId, fields.serviceId]),
     }));
 
+    // Transactional outbox (D-07): inserted with the confirmation; the rendered email is stored once (D-09)
+    const EmailOutbox = model('EmailOutbox', {
+      fields: {
+        id: field.id.uuidv7String(),
+        bookingId: field.uuidString(),
+        type: field.namedType(EmailType),
+        toAddress: field.text(),
+        subject: field.text(),
+        body: field.text(),
+        status: field.namedType(EmailStatus),
+        attempts: field.int().default(0),
+        // Left null until failed emails are retried
+        nextAttemptAt: field.temporal.timestamptz().optional(),
+        lastError: field.text().optional(),
+        providerMessageId: field.text().optional(),
+        sentAt: field.temporal.timestamptz().optional(),
+        createdAt: field.temporal.createdAtString(),
+        updatedAt: field.temporal.updatedAtString(),
+      },
+      relations: {
+        booking: rel.belongsTo(Booking, { from: 'bookingId', to: 'id' }).sql({ fk: { onDelete: 'restrict' } }),
+      },
+    }).attributes(({ fields, constraints }) => ({
+      // Exactly one email of each type per booking, even with two concurrent confirmations (D-07)
+      uniques: [constraints.unique([fields.bookingId, fields.type])],
+    }));
+
     return {
-      models: { Customer, User, Room, Service, Booking, BookingLine, BookingService },
+      models: { Customer, User, Room, Service, Booking, BookingLine, BookingService, EmailOutbox },
     };
   },
 );

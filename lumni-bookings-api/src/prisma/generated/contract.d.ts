@@ -23,9 +23,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'ea9c8cac0f4f1f26c79d06f1a3949ef6656bccae839f7f1f6e3e15813b17947c'>;
+  StorageHashBase<'e05f1303b1c450cea79dd3b4300cdd0787c1272181ec909b103570dcb1588759'>;
 export type ExecutionHash =
-  ExecutionHashBase<'a68fa84806edd68e50e3b56886e9b21b59a5f3fd624863d8793f81b2588b90e7'>;
+  ExecutionHashBase<'bc94ae760220e189b6886e703fe295458179d6604090a2dff122fad0260ad03d'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -247,6 +247,16 @@ type FieldTypeOverrides = {
           readonly input: 'draft' | 'confirmed' | 'completed' | 'cancelled';
         };
       };
+      readonly EmailOutbox: {
+        readonly status: {
+          readonly output: 'pending' | 'sent' | 'failed';
+          readonly input: 'pending' | 'sent' | 'failed';
+        };
+        readonly type: {
+          readonly output: 'booking_confirmation';
+          readonly input: 'booking_confirmation';
+        };
+      };
       readonly Room: {
         readonly size: {
           readonly output: 'small' | 'medium' | 'large';
@@ -282,6 +292,16 @@ type ColumnTypeOverrides = {
       readonly status: {
         readonly output: 'draft' | 'confirmed' | 'completed' | 'cancelled';
         readonly input: 'draft' | 'confirmed' | 'completed' | 'cancelled';
+      };
+    };
+    readonly EmailOutbox: {
+      readonly status: {
+        readonly output: 'pending' | 'sent' | 'failed';
+        readonly input: 'pending' | 'sent' | 'failed';
+      };
+      readonly type: {
+        readonly output: 'booking_confirmation';
+        readonly input: 'booking_confirmation';
       };
     };
     readonly Room: {
@@ -359,6 +379,24 @@ export namespace Models {
     updatedAt: FieldOutputTypes['public']['Customer']['updatedAt'];
     readonly [RelationKeys]?: never;
   };
+  export type public_EmailOutbox = {
+    attempts: FieldOutputTypes['public']['EmailOutbox']['attempts'];
+    body: FieldOutputTypes['public']['EmailOutbox']['body'];
+    bookingId: FieldOutputTypes['public']['EmailOutbox']['bookingId'];
+    createdAt: FieldOutputTypes['public']['EmailOutbox']['createdAt'];
+    id: FieldOutputTypes['public']['EmailOutbox']['id'];
+    lastError: FieldOutputTypes['public']['EmailOutbox']['lastError'];
+    nextAttemptAt: FieldOutputTypes['public']['EmailOutbox']['nextAttemptAt'];
+    providerMessageId: FieldOutputTypes['public']['EmailOutbox']['providerMessageId'];
+    sentAt: FieldOutputTypes['public']['EmailOutbox']['sentAt'];
+    status: FieldOutputTypes['public']['EmailOutbox']['status'];
+    subject: FieldOutputTypes['public']['EmailOutbox']['subject'];
+    toAddress: FieldOutputTypes['public']['EmailOutbox']['toAddress'];
+    type: FieldOutputTypes['public']['EmailOutbox']['type'];
+    updatedAt: FieldOutputTypes['public']['EmailOutbox']['updatedAt'];
+    booking: public_Booking;
+    readonly [RelationKeys]?: 'booking';
+  };
   export type public_Room = {
     capacity: FieldOutputTypes['public']['Room']['capacity'];
     createdAt: FieldOutputTypes['public']['Room']['createdAt'];
@@ -397,6 +435,7 @@ export declare const models: {
     BookingLine: Models.public_BookingLine;
     BookingService: Models.public_BookingService;
     Customer: Models.public_Customer;
+    EmailOutbox: Models.public_EmailOutbox;
     Room: Models.public_Room;
     Service: Models.public_Service;
     User: Models.public_User;
@@ -731,6 +770,124 @@ type ContractBase = Omit<
               indexes: readonly [];
               foreignKeys: readonly [];
             };
+            readonly EmailOutbox: {
+              columns: {
+                readonly attempts: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
+                  };
+                  readonly many: false;
+                };
+                readonly body: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly bookingId: {
+                  readonly dataType: 'pg/char';
+                  readonly codecId: 'sql/char@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 36 };
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/char';
+                  readonly codecId: 'sql/char@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly length: 36 };
+                  readonly many: false;
+                };
+                readonly lastError: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly nextAttemptAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly providerMessageId: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly sentAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: true;
+                  readonly many: false;
+                };
+                readonly status: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly subject: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly toAddress: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly type: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [{ readonly columns: readonly ['bookingId', 'type'] }];
+              indexes: readonly [
+                {
+                  readonly name: 'EmailOutbox_bookingId_idx_17848f4a';
+                  readonly prefix: 'EmailOutbox_bookingId_idx';
+                  readonly columns: readonly ['bookingId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'EmailOutbox';
+                    readonly columns: readonly ['bookingId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Booking';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly Room: {
               columns: {
                 readonly capacity: {
@@ -903,6 +1060,14 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly ['draft', 'confirmed', 'completed', 'cancelled'];
             };
+            readonly EmailStatus: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['pending', 'sent', 'failed'];
+            };
+            readonly EmailType: {
+              readonly kind: 'valueSet';
+              readonly values: readonly ['booking_confirmation'];
+            };
             readonly RoomSize: {
               readonly kind: 'valueSet';
               readonly values: readonly ['small', 'medium', 'large'];
@@ -932,6 +1097,10 @@ type ContractBase = Omit<
       readonly model: 'BookingService';
     };
     readonly Customer: { readonly namespace: 'public' & NamespaceId; readonly model: 'Customer' };
+    readonly EmailOutbox: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'EmailOutbox';
+    };
     readonly Room: { readonly namespace: 'public' & NamespaceId; readonly model: 'Room' };
     readonly Service: { readonly namespace: 'public' & NamespaceId; readonly model: 'Service' };
     readonly User: { readonly namespace: 'public' & NamespaceId; readonly model: 'User' };
@@ -1257,6 +1426,120 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly EmailOutbox: {
+            readonly fields: {
+              readonly attempts: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly body: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly bookingId: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/char@1';
+                  readonly typeParams: { readonly length: 36 };
+                };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'sql/char@1';
+                  readonly typeParams: { readonly length: 36 };
+                };
+              };
+              readonly lastError: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly nextAttemptAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly providerMessageId: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly sentAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly subject: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly toAddress: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly type: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
+            };
+            readonly relations: {
+              readonly booking: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Booking';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['bookingId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'EmailOutbox';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly attempts: { readonly column: 'attempts' };
+                readonly body: { readonly column: 'body' };
+                readonly bookingId: { readonly column: 'bookingId' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly lastError: { readonly column: 'lastError' };
+                readonly nextAttemptAt: { readonly column: 'nextAttemptAt' };
+                readonly providerMessageId: { readonly column: 'providerMessageId' };
+                readonly sentAt: { readonly column: 'sentAt' };
+                readonly status: { readonly column: 'status' };
+                readonly subject: { readonly column: 'subject' };
+                readonly toAddress: { readonly column: 'toAddress' };
+                readonly type: { readonly column: 'type' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+              };
+            };
+          };
           readonly Room: {
             readonly fields: {
               readonly capacity: {
@@ -1456,6 +1739,20 @@ type ContractBase = Omit<
               { readonly name: 'Cancelled'; readonly value: 'cancelled' },
             ];
           };
+          readonly EmailStatus: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'Pending'; readonly value: 'pending' },
+              { readonly name: 'Sent'; readonly value: 'sent' },
+              { readonly name: 'Failed'; readonly value: 'failed' },
+            ];
+          };
+          readonly EmailType: {
+            readonly codecId: 'pg/text@1';
+            readonly members: readonly [
+              { readonly name: 'BookingConfirmation'; readonly value: 'booking_confirmation' },
+            ];
+          };
           readonly RoomSize: {
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
@@ -1478,6 +1775,14 @@ type ContractBase = Omit<
             { readonly name: 'Confirmed'; readonly value: 'confirmed' },
             { readonly name: 'Completed'; readonly value: 'completed' },
             { readonly name: 'Cancelled'; readonly value: 'cancelled' },
+          ];
+          readonly EmailStatus: readonly [
+            { readonly name: 'Pending'; readonly value: 'pending' },
+            { readonly name: 'Sent'; readonly value: 'sent' },
+            { readonly name: 'Failed'; readonly value: 'failed' },
+          ];
+          readonly EmailType: readonly [
+            { readonly name: 'BookingConfirmation'; readonly value: 'booking_confirmation' },
           ];
           readonly RoomSize: readonly [
             { readonly name: 'Small'; readonly value: 'small' },
@@ -1594,6 +1899,31 @@ type ContractBase = Omit<
           readonly onUpdate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
           readonly ref: {
             readonly entry: 'Customer';
+            readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'EmailOutbox';
+            readonly field: 'createdAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'uuidv7'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'EmailOutbox';
+            readonly field: 'id';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
+          readonly onUpdate: { readonly id: 'timestamptzStringNow'; readonly kind: 'generator' };
+          readonly ref: {
+            readonly entry: 'EmailOutbox';
             readonly field: 'updatedAt';
             readonly namespace: 'public';
           };

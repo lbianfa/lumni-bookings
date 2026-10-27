@@ -1,0 +1,199 @@
+[
+  {
+    "id": "table.EmailOutbox",
+    "label": "Create table \"EmailOutbox\"",
+    "summary": "Creates table \"EmailOutbox\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "EmailOutbox"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"EmailOutbox\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmailOutbox\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "table \"EmailOutbox\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"EmailOutbox\"",
+        "sql": "CREATE TABLE \"public\".\"EmailOutbox\" (\n  \"attempts\" int4 DEFAULT 0 NOT NULL,\n  \"body\" text NOT NULL,\n  \"bookingId\" character(36) NOT NULL,\n  \"createdAt\" timestamptz NOT NULL,\n  \"id\" character(36) NOT NULL,\n  \"lastError\" text,\n  \"nextAttemptAt\" timestamptz,\n  \"providerMessageId\" text,\n  \"sentAt\" timestamptz,\n  \"status\" text NOT NULL,\n  \"subject\" text NOT NULL,\n  \"toAddress\" text NOT NULL,\n  \"type\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"EmailOutbox_status_check_a1bd2f80\" CHECK (\"status\" IN ('pending', 'sent', 'failed')),\n  CONSTRAINT \"EmailOutbox_type_check_29e0809a\" CHECK (\"type\" IN ('booking_confirmation'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"EmailOutbox\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3))) AS \"result\"",
+        "params": [
+          "\"public\".\"EmailOutbox\"",
+          "r",
+          "p"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "table \"EmailOutbox\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "unique.EmailOutbox.EmailOutbox_bookingId_type_key",
+    "label": "Add unique constraint on \"EmailOutbox\" (bookingId, type)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "EmailOutbox_bookingId_type_key",
+        "table": "EmailOutbox"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"EmailOutbox_bookingId_type_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "EmailOutbox_bookingId_type_key",
+          "public",
+          "\"public\".\"EmailOutbox\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"EmailOutbox_bookingId_type_key\" on \"EmailOutbox\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"EmailOutbox_bookingId_type_key\"",
+        "sql": "ALTER TABLE \"public\".\"EmailOutbox\" ADD CONSTRAINT \"EmailOutbox_bookingId_type_key\" UNIQUE (\"bookingId\", \"type\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify unique constraint \"EmailOutbox_bookingId_type_key\" exists on (bookingId, type)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "EmailOutbox_bookingId_type_key",
+          "public",
+          "\"public\".\"EmailOutbox\"",
+          "u",
+          "[\"bookingId\",\"type\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.EmailOutbox.EmailOutbox_bookingId_idx_17848f4a",
+    "label": "Create index \"EmailOutbox_bookingId_idx_17848f4a\" on \"EmailOutbox\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "EmailOutbox_bookingId_idx_17848f4a",
+        "table": "EmailOutbox"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"EmailOutbox_bookingId_idx_17848f4a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmailOutbox_bookingId_idx_17848f4a\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "index \"EmailOutbox_bookingId_idx_17848f4a\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"EmailOutbox_bookingId_idx_17848f4a\"",
+        "sql": "CREATE INDEX \"EmailOutbox_bookingId_idx_17848f4a\" ON \"public\".\"EmailOutbox\" (\"bookingId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"EmailOutbox_bookingId_idx_17848f4a\" exists on \"EmailOutbox\" with the planned definition",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_class\" AS \"c\" INNER JOIN \"pg_index\" AS \"i\" ON \"i\".\"indexrelid\" = \"c\".\"oid\" INNER JOIN \"pg_am\" AS \"m\" ON \"m\".\"oid\" = \"c\".\"relam\" WHERE (\"c\".\"oid\" = to_regclass($1) AND (\"c\".\"relkind\" = $2 OR \"c\".\"relkind\" = $3) AND \"i\".\"indrelid\" = to_regclass($4) AND NOT (\"i\".\"indisunique\") AND \"m\".\"amname\" = $5 AND (\"i\".\"indexprs\" IS NULL AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"i\".\"indkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"i\".\"indrelid\" AND key_attribute.attnum = key_column.attnum) = ($6)::jsonb) AND \"i\".\"indpred\" IS NULL)) AS \"result\"",
+        "params": [
+          "\"public\".\"EmailOutbox_bookingId_idx_17848f4a\"",
+          "i",
+          "I",
+          "\"public\".\"EmailOutbox\"",
+          "btree",
+          "[\"bookingId\"]"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.EmailOutbox.EmailOutbox_bookingId_fkey",
+    "label": "Add foreign key \"EmailOutbox_bookingId_fkey\" on \"EmailOutbox\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "EmailOutbox_bookingId_fkey",
+        "table": "EmailOutbox"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"EmailOutbox_bookingId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "EmailOutbox_bookingId_fkey",
+          "public",
+          "\"public\".\"EmailOutbox\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "FK \"EmailOutbox_bookingId_fkey\" on \"EmailOutbox\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"EmailOutbox_bookingId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"EmailOutbox\"\nADD CONSTRAINT \"EmailOutbox_bookingId_fkey\"\nFOREIGN KEY (\"bookingId\")\nREFERENCES \"public\".\"Booking\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"EmailOutbox_bookingId_fkey\" exists with the planned columns, referenced table and actions",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb AND \"c\".\"confrelid\" = to_regclass($6) AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"confkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"confrelid\" AND key_attribute.attnum = key_column.attnum) = ($7)::jsonb AND \"c\".\"confdeltype\" = $8 AND \"c\".\"confupdtype\" = $9)) AS \"result\"",
+        "params": [
+          "EmailOutbox_bookingId_fkey",
+          "public",
+          "\"public\".\"EmailOutbox\"",
+          "f",
+          "[\"bookingId\"]",
+          "\"public\".\"Booking\"",
+          "[\"id\"]",
+          "r",
+          "a"
+        ]
+      }
+    ]
+  }
+]

@@ -22,7 +22,7 @@ When they conflict, these rules win, then the official Prisma skills, then the t
 
 - Do not introduce CQRS: no command/query buses, no `@nestjs/cqrs`, no separate read and write models. A use case is one class with one `execute` method.
 - Do not introduce Event Sourcing: state is stored as current rows in PostgreSQL, never rebuilt from an event log.
-- Domain events are allowed only as plain in-process signals when a rule needs them. The confirmation email uses the transactional outbox table (D-08), not an event store.
+- Domain events are allowed only as plain in-process signals when a rule needs them. The confirmation email uses the transactional outbox table (D-07), not an event store; an in-process `@nestjs/event-emitter` event starts its send job after the commit (D-08).
 
 ## Layout (screaming architecture)
 
@@ -41,6 +41,7 @@ src/
         helpers/             #   injectable services several use cases share (no `execute`), e.g. access checks, quoting
       infrastructure/        # Prisma repositories (`prisma-<entity>.repo.ts`), external adapters (Resend, AI)
       http/                  # controllers, guards, exception filters; request/response DTOs in http/dtos/
+      jobs/                  # in-process jobs: event listeners and the adapters that start them (e.g. emails)
       <feature>.module.ts    # wires ports to adapters
   auth/                      # session login, logout and guards used by every feature (D-19, D-20)
   prisma/                    # Prisma contract, generated types, db client, seed (persistence only)
@@ -80,7 +81,7 @@ Clean Architecture is applied selectively. Use the full layers only where busine
 - Always inject with an explicit token: `constructor(@Inject(BookingRepository) private readonly bookings: BookingRepository)`. `pnpm dev` runs through `tsx` (esbuild), which does not emit the decorator metadata Nest needs to inject by type alone; the scaffold injects with explicit tokens everywhere.
 - Bind adapters in the feature module: `{ provide: BookingRepository, useClass: PrismaBookingRepository }`.
 - `PrismaModule` (`src/prisma.module.ts`) is global and imported once in `AppModule`. Inject `PrismaService` directly in infrastructure classes; never add it to a feature module's `providers`, which would create a second instance.
-- Existing ports: `Clock` (`src/shared/domain`, bound to `SystemClock`); `UnitOfWork` (`src/shared/application`, bound to `PrismaUnitOfWork`); `RoomRepository`, `BookingRepository`, `CustomerRepository`, `ServiceRepository`, `BookingLineRepository` and `BookingServiceRepository` (each in its feature's `domain/repos`), all with Prisma adapters and exported by their feature module. Planned: `EmailSender` (D-10).
+- Existing ports: `Clock` (`src/shared/domain`, bound to `SystemClock`); `UnitOfWork` (`src/shared/application`, bound to `PrismaUnitOfWork`); `RoomRepository`, `BookingRepository`, `CustomerRepository`, `ServiceRepository`, `BookingLineRepository` and `BookingServiceRepository` (each in its feature's `domain/repos`), all with Prisma adapters and exported by their feature module. `emails` (full layers, no `http`) owns `OutboxEmailRepository` and `EmailJobs` (exported; `ConfirmBooking` queues the email and starts the job after the commit) and `EmailSender` (D-10: `ResendEmailSender` when `RESEND_API_KEY` is set, with `EMAIL_FROM` as sender; `LocalEmailSender` otherwise).
 - Money columns go through `toCents` / `toNumeric` (`src/shared/infrastructure/numeric.ts`); Postgres constraint errors are detected with `isDatabaseError` (`src/shared/infrastructure/database-error.ts`) and translated into domain errors in the adapter.
 
 ## TypeScript and modules

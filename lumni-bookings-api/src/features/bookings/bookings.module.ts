@@ -4,6 +4,7 @@ import { AuthModule } from "../../auth/auth.module";
 import { BookingLinesModule } from "../booking-lines/booking-lines.module";
 import { BookingServicesModule } from "../booking-services/booking-services.module";
 import { CustomersModule } from "../customers/customers.module";
+import { EmailsModule } from "../emails/emails.module";
 import { QuoteRoom } from "../quotes/application/quote-room.use-case";
 import { RoomsModule } from "../rooms/rooms.module";
 import { ServicesModule } from "../services/services.module";
@@ -33,7 +34,15 @@ import { PrismaBookingRepository } from "./infrastructure/prisma-booking.repo";
 // Owns the booking flow and the admin's booking reads; the internal modules provide the repositories of its parts.
 // Keeps exporting the booking repository for the quote's availability check.
 @Module({
-  imports: [AuthModule, RoomsModule, CustomersModule, ServicesModule, BookingLinesModule, BookingServicesModule],
+  imports: [
+    AuthModule,
+    RoomsModule,
+    CustomersModule,
+    ServicesModule,
+    BookingLinesModule,
+    BookingServicesModule,
+    EmailsModule,
+  ],
   controllers: [BookingsController, MyBookingsController, AdminBookingsController],
   providers: [
     { provide: BookingRepository, useClass: PrismaBookingRepository },
